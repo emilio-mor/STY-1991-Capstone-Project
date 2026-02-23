@@ -1,0 +1,219 @@
+using ExchangeRateApp.Models;
+
+namespace ExchangeRateApp.Services;
+
+public interface IExchangeRateService
+{
+    Task<List<ExchangeRatePair>> GetTopForexRatesAsync();
+    Task<List<CryptoRate>> GetTopCryptoRatesAsync();
+    Task<ConversionResult?> ConvertAsync(string from, string to, double amount);
+    Task<TrendData?> GetTrendDataAsync(string base_, string target, int days = 30);
+    List<CurrencyInfo> GetAllCurrencies();
+    Task<double> GetRateAsync(string from, string to);
+}
+
+public class ExchangeRateService : IExchangeRateService
+{
+    // ── Currency master list ──────────────────────────────────────────────────
+    private static readonly List<CurrencyInfo> _currencies = new()
+    {
+        new() { Code = "USD", Name = "US Dollar", Symbol = "$", Flag = "🇺🇸" },
+        new() { Code = "EUR", Name = "Euro", Symbol = "€", Flag = "🇪🇺" },
+        new() { Code = "GBP", Name = "British Pound", Symbol = "£", Flag = "🇬🇧" },
+        new() { Code = "JPY", Name = "Japanese Yen", Symbol = "¥", Flag = "🇯🇵" },
+        new() { Code = "CAD", Name = "Canadian Dollar", Symbol = "CA$", Flag = "🇨🇦" },
+        new() { Code = "AUD", Name = "Australian Dollar", Symbol = "A$", Flag = "🇦🇺" },
+        new() { Code = "CHF", Name = "Swiss Franc", Symbol = "Fr", Flag = "🇨🇭" },
+        new() { Code = "CNY", Name = "Chinese Yuan", Symbol = "¥", Flag = "🇨🇳" },
+        new() { Code = "BRL", Name = "Brazilian Real", Symbol = "R$", Flag = "🇧🇷" },
+        new() { Code = "MXN", Name = "Mexican Peso", Symbol = "$", Flag = "🇲🇽" },
+        new() { Code = "INR", Name = "Indian Rupee", Symbol = "₹", Flag = "🇮🇳" },
+        new() { Code = "KRW", Name = "South Korean Won", Symbol = "₩", Flag = "🇰🇷" },
+        new() { Code = "SGD", Name = "Singapore Dollar", Symbol = "S$", Flag = "🇸🇬" },
+        new() { Code = "HKD", Name = "Hong Kong Dollar", Symbol = "HK$", Flag = "🇭🇰" },
+        new() { Code = "SEK", Name = "Swedish Krona", Symbol = "kr", Flag = "🇸🇪" },
+        new() { Code = "NOK", Name = "Norwegian Krone", Symbol = "kr", Flag = "🇳🇴" },
+        new() { Code = "DKK", Name = "Danish Krone", Symbol = "kr", Flag = "🇩🇰" },
+        new() { Code = "NZD", Name = "New Zealand Dollar", Symbol = "NZ$", Flag = "🇳🇿" },
+        new() { Code = "ZAR", Name = "South African Rand", Symbol = "R", Flag = "🇿🇦" },
+        new() { Code = "ARS", Name = "Argentine Peso", Symbol = "$", Flag = "🇦🇷" },
+        new() { Code = "CLP", Name = "Chilean Peso", Symbol = "$", Flag = "🇨🇱" },
+        new() { Code = "COP", Name = "Colombian Peso", Symbol = "$", Flag = "🇨🇴" },
+        new() { Code = "PEN", Name = "Peruvian Sol", Symbol = "S/.", Flag = "🇵🇪" },
+        new() { Code = "HNL", Name = "Honduran Lempira", Symbol = "L", Flag = "🇭🇳" },
+        new() { Code = "GTQ", Name = "Guatemalan Quetzal", Symbol = "Q", Flag = "🇬🇹" },
+        new() { Code = "CRC", Name = "Costa Rican Colón", Symbol = "₡", Flag = "🇨🇷" },
+        new() { Code = "DOP", Name = "Dominican Peso", Symbol = "RD$", Flag = "🇩🇴" },
+        new() { Code = "TRY", Name = "Turkish Lira", Symbol = "₺", Flag = "🇹🇷" },
+        new() { Code = "RUB", Name = "Russian Ruble", Symbol = "₽", Flag = "🇷🇺" },
+        new() { Code = "THB", Name = "Thai Baht", Symbol = "฿", Flag = "🇹🇭" },
+        new() { Code = "IDR", Name = "Indonesian Rupiah", Symbol = "Rp", Flag = "🇮🇩" },
+        new() { Code = "MYR", Name = "Malaysian Ringgit", Symbol = "RM", Flag = "🇲🇾" },
+        new() { Code = "PHP", Name = "Philippine Peso", Symbol = "₱", Flag = "🇵🇭" },
+        new() { Code = "VND", Name = "Vietnamese Dong", Symbol = "₫", Flag = "🇻🇳" },
+        new() { Code = "EGP", Name = "Egyptian Pound", Symbol = "£", Flag = "🇪🇬" },
+        new() { Code = "NGN", Name = "Nigerian Naira", Symbol = "₦", Flag = "🇳🇬" },
+        new() { Code = "KES", Name = "Kenyan Shilling", Symbol = "KSh", Flag = "🇰🇪" },
+        new() { Code = "GHS", Name = "Ghanaian Cedi", Symbol = "₵", Flag = "🇬🇭" },
+        new() { Code = "AED", Name = "UAE Dirham", Symbol = "د.إ", Flag = "🇦🇪" },
+        new() { Code = "SAR", Name = "Saudi Riyal", Symbol = "﷼", Flag = "🇸🇦" },
+        new() { Code = "ILS", Name = "Israeli Shekel", Symbol = "₪", Flag = "🇮🇱" },
+        new() { Code = "QAR", Name = "Qatari Riyal", Symbol = "﷼", Flag = "🇶🇦" },
+        new() { Code = "PKR", Name = "Pakistani Rupee", Symbol = "₨", Flag = "🇵🇰" },
+        new() { Code = "BDT", Name = "Bangladeshi Taka", Symbol = "৳", Flag = "🇧🇩" },
+        new() { Code = "UAH", Name = "Ukrainian Hryvnia", Symbol = "₴", Flag = "🇺🇦" },
+        new() { Code = "RON", Name = "Romanian Leu", Symbol = "lei", Flag = "🇷🇴" },
+        new() { Code = "HUF", Name = "Hungarian Forint", Symbol = "Ft", Flag = "🇭🇺" },
+        new() { Code = "CZK", Name = "Czech Koruna", Symbol = "Kč", Flag = "🇨🇿" },
+        new() { Code = "PLN", Name = "Polish Zloty", Symbol = "zł", Flag = "🇵🇱" },
+        new() { Code = "TWD", Name = "Taiwanese Dollar", Symbol = "NT$", Flag = "🇹🇼" },
+        new() { Code = "HRK", Name = "Croatian Kuna", Symbol = "kn", Flag = "🇭🇷" },
+        new() { Code = "BGN", Name = "Bulgarian Lev", Symbol = "лв", Flag = "🇧🇬" },
+        new() { Code = "ISK", Name = "Icelandic Króna", Symbol = "kr", Flag = "🇮🇸" },
+        new() { Code = "MAD", Name = "Moroccan Dirham", Symbol = "د.م.", Flag = "🇲🇦" },
+        new() { Code = "JOD", Name = "Jordanian Dinar", Symbol = "JD", Flag = "🇯🇴" },
+        new() { Code = "OMR", Name = "Omani Rial", Symbol = "﷼", Flag = "🇴🇲" },
+        new() { Code = "KWD", Name = "Kuwaiti Dinar", Symbol = "KD", Flag = "🇰🇼" },
+        new() { Code = "BHD", Name = "Bahraini Dinar", Symbol = "BD", Flag = "🇧🇭" },
+        new() { Code = "LKR", Name = "Sri Lankan Rupee", Symbol = "₨", Flag = "🇱🇰" },
+        new() { Code = "MMK", Name = "Myanmar Kyat", Symbol = "K", Flag = "🇲🇲" },
+    };
+
+    // ── USD base rates (simulated) ────────────────────────────────────────────
+    private static readonly Dictionary<string, double> _ratesFromUsd = new()
+    {
+        {"USD",1},{"EUR",0.9221},{"GBP",0.7912},{"JPY",149.72},{"CAD",1.3621},
+        {"AUD",1.5330},{"CHF",0.8821},{"CNY",7.2410},{"BRL",4.9620},{"MXN",17.124},
+        {"INR",83.21},{"KRW",1321.5},{"SGD",1.3421},{"HKD",7.8210},{"SEK",10.432},
+        {"NOK",10.621},{"DKK",6.8820},{"NZD",1.6430},{"ZAR",18.921},{"ARS",873.5},
+        {"CLP",924.3},{"COP",3952.4},{"PEN",3.7621},{"HNL",24.71},{"GTQ",7.8012},
+        {"CRC",520.12},{"DOP",58.42},{"TRY",32.15},{"RUB",91.25},{"THB",35.12},
+        {"IDR",15721},{"MYR",4.712},{"PHP",56.32},{"VND",24870},{"EGP",48.12},
+        {"NGN",1570.4},{"KES",129.4},{"GHS",14.21},{"AED",3.6725},{"SAR",3.7510},
+        {"ILS",3.7021},{"QAR",3.6410},{"PKR",278.4},{"BDT",110.12},{"UAH",39.21},
+        {"RON",4.5821},{"HUF",357.1},{"CZK",23.12},{"PLN",4.0120},{"TWD",32.45},
+        {"HRK",7.1240},{"BGN",1.8032},{"ISK",138.4},{"MAD",10.021},{"JOD",0.7092},
+        {"OMR",0.3850},{"KWD",0.3069},{"BHD",0.3770},{"LKR",312.4},{"MMK",2098.5}
+    };
+
+    private static readonly Dictionary<string, (double change, string icon, string color)> _forexMeta = new()
+    {
+        {"EUR", (+0.23, "🇪🇺", "#003399")},
+        {"GBP", (-0.14, "🇬🇧", "#012169")},
+        {"JPY", (+0.41, "🇯🇵", "#BC002D")},
+        {"CAD", (-0.07, "🇨🇦", "#FF0000")},
+        {"AUD", (+0.18, "🇦🇺", "#00008B")},
+    };
+
+    public List<CurrencyInfo> GetAllCurrencies() => _currencies;
+
+    public Task<double> GetRateAsync(string from, string to)
+    {
+        var fromRate = _ratesFromUsd.GetValueOrDefault(from.ToUpper(), 1);
+        var toRate = _ratesFromUsd.GetValueOrDefault(to.ToUpper(), 1);
+        return Task.FromResult(toRate / fromRate);
+    }
+
+    public async Task<List<ExchangeRatePair>> GetTopForexRatesAsync()
+    {
+        var pairs = new List<ExchangeRatePair>();
+        foreach (var (code, (change, flag, _)) in _forexMeta)
+        {
+            var rate = await GetRateAsync("USD", code);
+            var cInfo = _currencies.FirstOrDefault(c => c.Code == code);
+            pairs.Add(new ExchangeRatePair
+            {
+                BaseCurrency = "USD",
+                TargetCurrency = code,
+                Rate = Math.Round(rate, 4),
+                ChangePercent = change,
+                ChangeValue = Math.Round(rate * change / 100, 4),
+                BaseName = "US Dollar",
+                TargetName = cInfo?.Name ?? code,
+                BaseFlag = "🇺🇸",
+                TargetFlag = flag,
+                LastUpdated = DateTime.UtcNow
+            });
+        }
+        return pairs;
+    }
+
+    public Task<List<CryptoRate>> GetTopCryptoRatesAsync()
+    {
+        var cryptos = new List<CryptoRate>
+        {
+            new() { Symbol="BTC", Name="Bitcoin",   PriceUsd=67420.50, ChangePercent24h=+2.14, MarketCap=1_320_000_000_000, Volume24h=28_500_000_000, Icon="₿", Color="#F7931A" },
+            new() { Symbol="ETH", Name="Ethereum",  PriceUsd=3521.80,  ChangePercent24h=+3.41, MarketCap=423_000_000_000,   Volume24h=14_200_000_000, Icon="Ξ", Color="#627EEA" },
+            new() { Symbol="BNB", Name="BNB",        PriceUsd=598.30,   ChangePercent24h=+1.22, MarketCap=87_500_000_000,    Volume24h=1_900_000_000,  Icon="⬡", Color="#F3BA2F" },
+            new() { Symbol="SOL", Name="Solana",     PriceUsd=182.40,   ChangePercent24h=+5.67, MarketCap=81_200_000_000,    Volume24h=3_800_000_000,  Icon="◎", Color="#9945FF" },
+            new() { Symbol="XRP", Name="XRP",        PriceUsd=0.5921,   ChangePercent24h=+0.89, MarketCap=33_400_000_000,    Volume24h=1_200_000_000,  Icon="✕", Color="#346AA9" },
+        };
+        return Task.FromResult(cryptos);
+    }
+
+    public async Task<ConversionResult?> ConvertAsync(string from, string to, double amount)
+    {
+        from = from.ToUpper();
+        to = to.ToUpper();
+        var rate = await GetRateAsync(from, to);
+        var fromInfo = _currencies.FirstOrDefault(c => c.Code == from);
+        var toInfo = _currencies.FirstOrDefault(c => c.Code == to);
+        return new ConversionResult
+        {
+            FromCurrency = from,
+            ToCurrency = to,
+            FromName = fromInfo?.Name ?? from,
+            ToName = toInfo?.Name ?? to,
+            FromFlag = fromInfo?.Flag ?? "🏳",
+            ToFlag = toInfo?.Flag ?? "🏳",
+            Amount = amount,
+            Result = Math.Round(amount * rate, 6),
+            Rate = Math.Round(rate, 6),
+            InverseRate = Math.Round(1 / rate, 6),
+            Timestamp = DateTime.UtcNow
+        };
+    }
+
+    public Task<TrendData?> GetTrendDataAsync(string base_, string target, int days = 30)
+    {
+        var b = base_.ToUpper();
+        var t = target.ToUpper();
+        var baseInfo = _currencies.FirstOrDefault(c => c.Code == b);
+        var targetInfo = _currencies.FirstOrDefault(c => c.Code == t);
+        var fromRate = _ratesFromUsd.GetValueOrDefault(b, 1);
+        var toRate = _ratesFromUsd.GetValueOrDefault(t, 1);
+        var currentRate = toRate / fromRate;
+
+        // Simulate 30-day history
+        var rng = new Random(b.GetHashCode() ^ t.GetHashCode());
+        var history = new List<RatePoint>();
+        var rate = currentRate * (1 + (rng.NextDouble() - 0.5) * 0.05);
+        for (int i = days; i >= 0; i--)
+        {
+            rate += (rng.NextDouble() - 0.5) * currentRate * 0.01;
+            history.Add(new RatePoint
+            {
+                Date = DateTime.UtcNow.AddDays(-i),
+                Rate = Math.Round(rate, 6)
+            });
+        }
+
+        var firstRate = history.First().Rate;
+        var changePercent = (currentRate - firstRate) / firstRate * 100;
+
+        var data = new TrendData
+        {
+            Pair = $"{b}/{t}",
+            BaseName = baseInfo?.Name ?? b,
+            TargetName = targetInfo?.Name ?? t,
+            BaseFlag = baseInfo?.Flag ?? "🏳",
+            TargetFlag = targetInfo?.Flag ?? "🏳",
+            CurrentRate = Math.Round(currentRate, 6),
+            ChangePercent = Math.Round(changePercent, 2),
+            High = history.Max(h => h.Rate),
+            Low = history.Min(h => h.Rate),
+            History = history
+        };
+        return Task.FromResult<TrendData?>(data);
+    }
+}

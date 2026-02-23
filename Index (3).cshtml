@@ -1,0 +1,222 @@
+using ExchangeRateApp.Data;
+using ExchangeRateApp.Models;
+using Microsoft.AspNetCore.SignalR;
+using Microsoft.EntityFrameworkCore;
+
+namespace ExchangeRateApp.Services;
+
+// ─── User Service ─────────────────────────────────────────────────────────────
+
+public interface IUserService
+{
+    Task<User?> AuthenticateAsync(string emailOrUsername, string password);
+    Task<(bool success, string error)> RegisterAsync(RegisterViewModel model);
+    Task<User?> GetByIdAsync(int id);
+    Task UpdateLastLoginAsync(int userId);
+}
+
+public class UserService : IUserService
+{
+    private readonly AppDbContext _db;
+    public UserService(AppDbContext db) { _db = db; }
+
+    public async Task<User?> AuthenticateAsync(string emailOrUsername, string password)
+    {
+        var user = await _db.Users
+            .FirstOrDefaultAsync(u => u.Email == emailOrUsername || u.Username == emailOrUsername);
+        if (user == null) return null;
+        return BCrypt.Net.BCrypt.Verify(password, user.PasswordHash) ? user : null;
+    }
+
+    public async Task<(bool success, string error)> RegisterAsync(RegisterViewModel model)
+    {
+        if (await _db.Users.AnyAsync(u => u.Email == model.Email))
+            return (false, "An account with this email already exists.");
+        if (await _db.Users.AnyAsync(u => u.Username == model.Username))
+            return (false, "Username is already taken.");
+
+        var user = new User
+        {
+            Username = model.Username,
+            Email = model.Email,
+            FullName = model.FullName,
+            PasswordHash = BCrypt.Net.BCrypt.HashPassword(model.Password),
+            CreatedAt = DateTime.UtcNow
+        };
+        _db.Users.Add(user);
+        await _db.SaveChangesAsync();
+        return (true, "");
+    }
+
+    public Task<User?> GetByIdAsync(int id) =>
+        _db.Users
+            .Include(u => u.FavoriteCurrencies)
+            .Include(u => u.NotificationAlerts)
+            .FirstOrDefaultAsync(u => u.Id == id);
+
+    public async Task UpdateLastLoginAsync(int userId)
+    {
+        var user = await _db.Users.FindAsync(userId);
+        if (user != null) { user.LastLogin = DateTime.UtcNow; await _db.SaveChangesAsync(); }
+    }
+}
+
+// ─── Notification Service ─────────────────────────────────────────────────────
+
+public interface INotificationService
+{
+    Task<List<NotificationAlert>> GetAlertsAsync(int userId);
+    Task<List<NotificationLog>> GetLogsAsync(int userId);
+    Task<bool> CreateAlertAsync(int userId, CreateAlertViewModel model);
+    Task DeleteAlertAsync(int userId, int alertId);
+    Task MarkLogsReadAsync(int userId);
+    Task<int> GetUnreadCountAsync(int userId);
+    Task AddFavoriteAsync(int userId, string code, string name, string flag, bool isCrypto);
+    Task RemoveFavoriteAsync(int userId, string code);
+    Task<List<FavoriteCurrency>> GetFavoritesAsync(int userId);
+}
+
+public class NotificationService : INotificationService
+{
+    private readonly AppDbContext _db;
+    public NotificationService(AppDbContext db) { _db = db; }
+
+    public Task<List<NotificationAlert>> GetAlertsAsync(int userId) =>
+        _db.NotificationAlerts.Where(a => a.UserId == userId).OrderByDescending(a => a.CreatedAt).ToListAsync();
+
+    public Task<List<NotificationLog>> GetLogsAsync(int userId) =>
+        _db.NotificationLogs.Where(l => l.UserId == userId).OrderByDescending(l => l.CreatedAt).Take(50).ToListAsync();
+
+    public async Task<bool> CreateAlertAsync(int userId, CreateAlertViewModel model)
+    {
+        var alert = new NotificationAlert
+        {
+            UserId = userId,
+            BaseCurrency = model.BaseCurrency.ToUpper(),
+            TargetCurrency = model.TargetCurrency.ToUpper(),
+            TargetRate = model.TargetRate,
+            Condition = model.Condition,
+            IsActive = true,
+            CreatedAt = DateTime.UtcNow
+        };
+        _db.NotificationAlerts.Add(alert);
+        await _db.SaveChangesAsync();
+        return true;
+    }
+
+    public async Task DeleteAlertAsync(int userId, int alertId)
+    {
+        var alert = await _db.NotificationAlerts.FirstOrDefaultAsync(a => a.Id == alertId && a.UserId == userId);
+        if (alert != null) { _db.NotificationAlerts.Remove(alert); await _db.SaveChangesAsync(); }
+    }
+
+    public async Task MarkLogsReadAsync(int userId)
+    {
+        var logs = await _db.NotificationLogs.Where(l => l.UserId == userId && !l.IsRead).ToListAsync();
+        logs.ForEach(l => l.IsRead = true);
+        await _db.SaveChangesAsync();
+    }
+
+    public Task<int> GetUnreadCountAsync(int userId) =>
+        _db.NotificationLogs.CountAsync(l => l.UserId == userId && !l.IsRead);
+
+    public async Task AddFavoriteAsync(int userId, string code, string name, string flag, bool isCrypto)
+    {
+        if (!await _db.FavoriteCurrencies.AnyAsync(f => f.UserId == userId && f.CurrencyCode == code))
+        {
+            _db.FavoriteCurrencies.Add(new FavoriteCurrency
+            {
+                UserId = userId, CurrencyCode = code, CurrencyName = name, Flag = flag,
+                IsCrypto = isCrypto, AddedAt = DateTime.UtcNow
+            });
+            await _db.SaveChangesAsync();
+        }
+    }
+
+    public async Task RemoveFavoriteAsync(int userId, string code)
+    {
+        var fav = await _db.FavoriteCurrencies.FirstOrDefaultAsync(f => f.UserId == userId && f.CurrencyCode == code);
+        if (fav != null) { _db.FavoriteCurrencies.Remove(fav); await _db.SaveChangesAsync(); }
+    }
+
+    public Task<List<FavoriteCurrency>> GetFavoritesAsync(int userId) =>
+        _db.FavoriteCurrencies.Where(f => f.UserId == userId).OrderBy(f => f.AddedAt).ToListAsync();
+}
+
+// ─── Background Rate Monitor ──────────────────────────────────────────────────
+
+public class RateMonitorService : BackgroundService
+{
+    private readonly IServiceProvider _services;
+    private readonly ILogger<RateMonitorService> _logger;
+
+    public RateMonitorService(IServiceProvider services, ILogger<RateMonitorService> logger)
+    {
+        _services = services;
+        _logger = logger;
+    }
+
+    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+    {
+        while (!stoppingToken.IsCancellationRequested)
+        {
+            try
+            {
+                using var scope = _services.CreateScope();
+                var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+                var rateService = scope.ServiceProvider.GetRequiredService<IExchangeRateService>();
+                var hub = scope.ServiceProvider.GetRequiredService<IHubContext<NotificationHub>>();
+
+                var activeAlerts = await db.NotificationAlerts
+                    .Where(a => a.IsActive && !a.IsTriggered)
+                    .ToListAsync(stoppingToken);
+
+                foreach (var alert in activeAlerts)
+                {
+                    var rate = await rateService.GetRateAsync(alert.BaseCurrency, alert.TargetCurrency);
+                    var triggered = alert.Condition == AlertCondition.Above ? rate >= alert.TargetRate
+                                                                             : rate <= alert.TargetRate;
+                    if (triggered)
+                    {
+                        alert.IsTriggered = true;
+                        alert.TriggeredAt = DateTime.UtcNow;
+
+                        var condition = alert.Condition == AlertCondition.Above ? "reached above" : "dropped below";
+                        var message = $"🔔 {alert.BaseCurrency}/{alert.TargetCurrency} has {condition} {alert.TargetRate:F4}. Current rate: {rate:F4}";
+
+                        db.NotificationLogs.Add(new NotificationLog
+                        {
+                            UserId = alert.UserId,
+                            Message = message,
+                            CurrencyPair = $"{alert.BaseCurrency}/{alert.TargetCurrency}",
+                            IsRead = false,
+                            CreatedAt = DateTime.UtcNow
+                        });
+
+                        // Push real-time notification via SignalR
+                        await hub.Clients.Group($"user_{alert.UserId}")
+                            .SendAsync("RateAlert", new { message, pair = $"{alert.BaseCurrency}/{alert.TargetCurrency}" }, stoppingToken);
+                    }
+                }
+
+                await db.SaveChangesAsync(stoppingToken);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error in RateMonitorService");
+            }
+
+            await Task.Delay(TimeSpan.FromMinutes(1), stoppingToken);
+        }
+    }
+}
+
+// ─── SignalR Hub ──────────────────────────────────────────────────────────────
+
+public class NotificationHub : Hub
+{
+    public async Task JoinUserGroup(string userId)
+    {
+        await Groups.AddToGroupAsync(Context.ConnectionId, $"user_{userId}");
+    }
+}

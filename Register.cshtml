@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] — FXPulse</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    @RenderSection("Styles", required: false)
+</head>
+<body>
+
+@if (User.Identity?.IsAuthenticated == true)
+{
+    var unread = ViewBag.UnreadCount as int? ?? 0;
+    <div class="app-shell">
+        <!-- Sidebar -->
+        <nav class="sidebar">
+            <div class="sidebar-logo">FX</div>
+            <ul class="nav-list">
+                <li>
+                    <a asp-controller="Dashboard" asp-action="Index" class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Dashboard" ? "active" : "")" title="Dashboard">
+                        <span class="nav-icon">⬡</span>
+                        <span class="nav-label">Dashboard</span>
+                    </a>
+                </li>
+                <li>
+                    <a asp-controller="Converter" asp-action="Index" class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Converter" ? "active" : "")" title="Converter">
+                        <span class="nav-icon">⇄</span>
+                        <span class="nav-label">Converter</span>
+                    </a>
+                </li>
+                <li>
+                    <a asp-controller="Trends" asp-action="Index" class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Trends" ? "active" : "")" title="Trends">
+                        <span class="nav-icon">↗</span>
+                        <span class="nav-label">Trends</span>
+                    </a>
+                </li>
+                <li>
+                    <a asp-controller="Favorites" asp-action="Index" class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Favorites" ? "active" : "")" title="Favorites">
+                        <span class="nav-icon">★</span>
+                        <span class="nav-label">Favorites</span>
+                    </a>
+                </li>
+                <li>
+                    <a asp-controller="Notifications" asp-action="Index" class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Notifications" ? "active" : "")" title="Alerts">
+                        <span class="nav-icon">🔔</span>
+                        <span class="nav-label">Alerts</span>
+                        @if (unread > 0)
+                        {
+                            <span class="badge">@unread</span>
+                        }
+                    </a>
+                </li>
+            </ul>
+            <div class="sidebar-footer">
+                <div class="user-avatar" title="@User.Identity.Name">
+                    @User.Identity.Name?.Substring(0, 1).ToUpper()
+                </div>
+                <form asp-controller="Account" asp-action="Logout" method="post" style="margin:0">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="logout-btn" title="Logout">⏻</button>
+                </form>
+            </div>
+        </nav>
+
+        <!-- Main -->
+        <main class="main-content">
+            @if (TempData["Success"] != null)
+            {
+                <div class="toast toast-success">✓ @TempData["Success"]</div>
+            }
+            @if (TempData["Error"] != null)
+            {
+                <div class="toast toast-error">✕ @TempData["Error"]</div>
+            }
+            @RenderBody()
+        </main>
+    </div>
+
+    <!-- SignalR real-time notifications -->
+    <div id="realtime-toast" class="realtime-toast hidden"></div>
+    <script src="~/lib/signalr/signalr.min.js"></script>
+    <script>
+        const userId = "@User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value";
+        const connection = new signalR.HubConnectionBuilder().withUrl("/notificationHub").build();
+        connection.on("RateAlert", (data) => {
+            const el = document.getElementById('realtime-toast');
+            el.textContent = data.message;
+            el.classList.remove('hidden');
+            setTimeout(() => el.classList.add('hidden'), 6000);
+        });
+        connection.start().then(() => connection.invoke("JoinUserGroup", userId)).catch(console.error);
+
+        // Auto-dismiss toasts
+        setTimeout(() => document.querySelectorAll('.toast').forEach(t => t.style.opacity = '0'), 4000);
+    </script>
+}
+else
+{
+    @RenderBody()
+}
+
+@RenderSection("Scripts", required: false)
+</body>
+</html>

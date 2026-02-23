@@ -1,0 +1,95 @@
+using ExchangeRateApp.Models;
+using Microsoft.EntityFrameworkCore;
+
+namespace ExchangeRateApp.Data;
+
+public class AppDbContext : DbContext
+{
+    public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
+
+    public DbSet<User> Users { get; set; }
+    public DbSet<FavoriteCurrency> FavoriteCurrencies { get; set; }
+    public DbSet<NotificationAlert> NotificationAlerts { get; set; }
+    public DbSet<NotificationLog> NotificationLogs { get; set; }
+    public DbSet<RateSnapshot> RateSnapshots { get; set; }
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<User>(e =>
+        {
+            e.HasKey(u => u.Id);
+            e.HasIndex(u => u.Email).IsUnique();
+            e.HasIndex(u => u.Username).IsUnique();
+        });
+
+        modelBuilder.Entity<FavoriteCurrency>(e =>
+        {
+            e.HasKey(f => f.Id);
+            e.HasOne(f => f.User).WithMany(u => u.FavoriteCurrencies).HasForeignKey(f => f.UserId);
+            e.HasIndex(f => new { f.UserId, f.CurrencyCode }).IsUnique();
+        });
+
+        modelBuilder.Entity<NotificationAlert>(e =>
+        {
+            e.HasKey(n => n.Id);
+            e.HasOne(n => n.User).WithMany(u => u.NotificationAlerts).HasForeignKey(n => n.UserId);
+        });
+
+        modelBuilder.Entity<NotificationLog>(e =>
+        {
+            e.HasKey(n => n.Id);
+            e.HasOne(n => n.User).WithMany().HasForeignKey(n => n.UserId);
+        });
+
+        modelBuilder.Entity<RateSnapshot>(e =>
+        {
+            e.HasKey(r => r.Id);
+            e.HasIndex(r => new { r.BaseCurrency, r.TargetCurrency, r.Timestamp });
+        });
+    }
+}
+
+public static class DbSeeder
+{
+    public static void Seed(AppDbContext db)
+    {
+        // Seed demo user
+        if (!db.Users.Any())
+        {
+            db.Users.Add(new User
+            {
+                Username = "demo",
+                Email = "demo@example.com",
+                PasswordHash = BCrypt.Net.BCrypt.HashPassword("demo123"),
+                CreatedAt = DateTime.UtcNow,
+                FullName = "Demo User"
+            });
+            db.SaveChanges();
+        }
+
+        // Seed some rate snapshots for trend data
+        if (!db.RateSnapshots.Any())
+        {
+            var pairs = new[] { ("USD", "EUR"), ("USD", "GBP"), ("USD", "JPY"), ("USD", "CAD"), ("USD", "AUD") };
+            var baseRates = new Dictionary<string, double> {
+                {"EUR", 0.9221}, {"GBP", 0.7912}, {"JPY", 149.72}, {"CAD", 1.3621}, {"AUD", 1.5330}
+            };
+            var rng = new Random(42);
+            foreach (var (b, t) in pairs)
+            {
+                var baseRate = baseRates[t];
+                for (int i = 30; i >= 0; i--)
+                {
+                    db.RateSnapshots.Add(new RateSnapshot
+                    {
+                        BaseCurrency = b,
+                        TargetCurrency = t,
+                        Rate = baseRate + (rng.NextDouble() - 0.5) * baseRate * 0.02,
+                        Timestamp = DateTime.UtcNow.AddDays(-i)
+                    });
+                }
+            }
+            db.SaveChanges();
+        }
+    }
+}
