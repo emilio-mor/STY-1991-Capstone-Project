@@ -115,7 +115,7 @@ The app ships with realistic mock data. To use live rates:
 }
 ```
 
-## 🔔 Real-time Notifications
+## Real-time Notifications
 
 Alerts are monitored by a background service (`RateMonitorService`) that checks every 60 seconds. When triggered:
 1. Alert is marked as triggered in the database
