@@ -2,20 +2,23 @@
 Software Engineering Concepts Project
 # FXPulse — Exchange Rate Web App
 
-A full-featured C# ASP.NET Core MVC web application for tracking exchange rates, converting currencies, and setting rate alerts.
+FXPulse is an application designed to provide real-time exchange rates for currencies worldwide, including both traditional fiat currencies and cryptocurrencies.
 
-## ✨ Features
+## Features
 
 | Feature | Details |
 |---|---|
-| 🔐 Authentication | Register & Login with BCrypt-hashed passwords, cookie auth, remember-me |
-| 📊 Dashboard | Top 5 Forex pairs + Top 5 Cryptos vs USD with sparkline charts |
-| 💱 Converter | Convert between 59 world currencies (e.g. BRL → HNL) |
-| 📈 Trends | Interactive 7/14/30/60/90-day historical charts + data table |
-| ★ Favorites | Add/remove currencies, quick-access from dashboard |
-| 🔔 Alerts | Set rate threshold alerts (above/below), real-time push via SignalR |
+| Authentication | Register & Login with BCrypt-hashed passwords, cookie auth, remember-me |
+| Dashboard | Top 5 Forex pairs + Top 5 Cryptos vs USD with sparkline charts |
+| Converter | Convert between 59 world currencies (e.g. BRL → HNL) |
+| Trends | Interactive 7/14/30/60/90-day historical charts + data table |
+| Favorites | Add/remove currencies, quick-access from dashboard |
+| Alerts | Set rate threshold alerts (above/below), real-time push via SignalR |
 
-## 🏗 Tech Stack
+FXPulse is designed to be a scalable, secure, and user-friendly platform that centralizes global and cryptocurrency exchange data in one powerful app.
+
+
+## Tech Stack
 
 - **ASP.NET Core 8 MVC** — C# backend, Razor views
 - **Entity Framework Core + SQLite** — Persistent database (auto-migrated on startup)
@@ -24,7 +27,7 @@ A full-featured C# ASP.NET Core MVC web application for tracking exchange rates,
 - **Chart.js** — Interactive trend charts
 - **Custom CSS** — Dark theme design system (no Bootstrap)
 
-## 🚀 Getting Started
+## Getting Started
 
 ### Prerequisites
 - [.NET 8 SDK](https://dotnet.microsoft.com/download/dotnet/8)
@@ -52,7 +55,7 @@ Then open: **http://localhost:5000**
 
 Or register a new account at `/Account/Register`
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 ExchangeRateApp/
@@ -84,7 +87,7 @@ ExchangeRateApp/
 └── ExchangeRateApp.csproj
 ```
 
-## 🌐 Connecting to Live Rate APIs
+## Connecting to Live Rate APIs
 
 The app ships with realistic mock data. To use live rates:
 
