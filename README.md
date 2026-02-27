@@ -32,7 +32,7 @@ The FXPulse system shall:
 - Send real-time notifications to users via SignalR when alerts are triggered.
 - Store user preferences and alerts in a persistent SQLite database.
 
-### 2. Non-Functional Requiredments
+### 2. Non-Functional Requirements
 The FXPulse system shall:
 - Provide real-time exchange rate updates with minimal latency.
 - Respond to user requests within 2 seconds under normal load.
