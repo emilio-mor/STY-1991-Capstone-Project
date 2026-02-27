@@ -17,6 +17,32 @@ FXPulse is an application designed to provide real-time exchange rates for curre
 
 FXPulse is designed to be a scalable, secure, and user-friendly platform that centralizes global and cryptocurrency exchange data in one powerful app.
 
+## System Requirement Specification
+### 1. Functional Requirements
+The FXPulse system shall:
+- Allow users to register a new account.
+- Allow users to log in and log out securely.
+- Encrypt and store user passwords using BCrypt hashing.
+- Display the top 5 Forex pairs and top 5 cryptocurrencies on the dashboard.
+- Allow users to convert between 59 supported currencies.
+- Display historical exchange rate trends (7, 14, 30, 60, 90 days).
+- Allow users to add and remove favorite currencies.
+- Allow users to set rate threshold alerts (above or below a specified value).
+- Monitor exchange rates in the background every 60 seconds.
+- Send real-time notifications to users via SignalR when alerts are triggered.
+- Store user preferences and alerts in a persistent SQLite database.
+
+### 2. Non-Functional Requiredments
+The FXPulse system shall:
+- Provide real-time exchange rate updates with minimal latency.
+- Respond to user requests within 2 seconds under normal load.
+- Support multiple concurrent users.
+- Ensure secure authentication using hashed passwords and cookie-based authentication.
+- Maintain data integrity using Entity Framework Core.
+- Be compatible with modern web browsers (Chrome, Edge, Firefox).
+- Be scalable to integrate live exchange rate APIs.
+- Maintain 99% system availability under normal operating conditions.
+- Use a clean and responsive dark-theme UI for better user experience.
 
 ## Tech Stack
 
