@@ -1,0 +1,56 @@
+using OverdriveExchange.Data;
+using OverdriveExchange.Services;
+using Microsoft.EntityFrameworkCore;
+
+var builder = WebApplication.CreateBuilder(args);
+
+// ── Blazor Server ────────────────────────────────────────────────────────────
+builder.Services.AddRazorPages();
+builder.Services.AddServerSideBlazor();
+
+// ── Database ─────────────────────────────────────────────────────────────────
+builder.Services.AddDbContextFactory<AppDbContext>(opts =>
+    opts.UseSqlite("Data Source=overdriveexchange.db"));
+
+// ── Application Services ─────────────────────────────────────────────────────
+builder.Services.AddScoped<AuthService>();
+builder.Services.AddScoped<IExchangeRateService, ExchangeRateService>();
+builder.Services.AddScoped<IFavoritesService, FavoritesService>();
+builder.Services.AddScoped<IAlertService, AlertService>();
+builder.Services.AddHostedService<AlertMonitorService>();
+
+// ── Session (used for auth cookie) ───────────────────────────────────────────
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddDistributedMemoryCache();
+builder.Services.AddSession(o =>
+{
+    o.IdleTimeout = TimeSpan.FromHours(8);
+    o.Cookie.IsEssential = true;
+    o.Cookie.HttpOnly = true;
+});
+
+var app = builder.Build();
+
+// ── Seed database ─────────────────────────────────────────────────────────────
+using (var scope = app.Services.CreateScope())
+{
+    var fac = scope.ServiceProvider.GetRequiredService<IDbContextFactory<AppDbContext>>();
+    using var db = fac.CreateDbContext();
+    db.Database.EnsureCreated();
+    DbSeeder.Seed(db);
+}
+
+if (!app.Environment.IsDevelopment())
+{
+    app.UseExceptionHandler("/Error");
+    app.UseHsts();
+}
+
+app.UseStaticFiles();
+app.UseRouting();
+app.UseSession();
+
+app.MapBlazorHub();
+app.MapFallbackToPage("/_Host");
+
+app.Run();
