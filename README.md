@@ -5,15 +5,17 @@ A full-stack real-time exchange rate application built entirely with C# / ASP.NE
 
 Tech Stack
 Layer	Technology
-Backend	C# ASP.NET Core 8
-Frontend	Blazor Server (C# components)
-Database	SQLite via EF Core 8
-Auth	BCrypt password hashing, session-based
-Charts	Pure SVG — zero JavaScript
+Backend	| C# ASP.NET Core 8
+Frontend |	Blazor Server (C# components)
+Database |	SQLite via EF Core 8
+Auth |	BCrypt password hashing, session-based
+Charts |	Pure SVG — zero JavaScript
 Styling	Custom CSS (dark terminal theme)
+----------
 Quick Start
 Prerequisites
 .NET 8 SDK
+----------
 Run
 git clone / copy project to folder
 cd OverdriveExchange
@@ -21,12 +23,13 @@ cd OverdriveExchange
 dotnet restore
 dotnet run
 Open http://localhost:5000
-
+--------------
 Demo Credentials
-Field	Value
-Email	demo@overdriveexchange.app
-Username	demo
-Password	demo123
+Field |	Value
+Email |	demo@overdriveexchange.app
+Username |	demo
+Password |	demo123
+----------
 Project Structure
 OverdriveExchange/
 ├── OverdriveExchange.csproj                    ← Project file (NuGet packages)
