@@ -17,6 +17,7 @@ Prerequisites
 [.NET 8 SDK](https://dotnet.microsoft.com/download/dotnet/8)
 ----------
 Run
+bash
 git clone / copy project to folder
 cd OverdriveExchange
 
@@ -81,6 +82,11 @@ Login with email or username
 BCrypt hashed passwords
 Scoped AuthService keeps session in Blazor circuit
 Register new accounts with full validation
+🧩 Design Decisions
+Blazor Server chosen for full C# stack (no JS dependency)
+SVG charts instead of Chart.js → zero JS, full control
+Scoped AuthService replaces cookie-based auth
+SQLite for simplicity and portability
 📊 Dashboard
 Good morning/afternoon/evening greeting
 4 stat cards (currencies, crypto, favorites, alerts)
