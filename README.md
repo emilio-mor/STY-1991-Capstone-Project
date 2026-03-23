@@ -14,7 +14,7 @@ Styling	| Custom CSS (dark terminal theme)
 ----------
 Quick Start
 Prerequisites
-.NET 8 SDK
+[.NET 8 SDK](https://dotnet.microsoft.com/download/dotnet/8)
 ----------
 Run
 git clone / copy project to folder
