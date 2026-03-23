@@ -91,6 +91,11 @@ SQLite for simplicity and portability
 Uses mock exchange rate data (no live API yet)
 No persistent login across browser sessions
 Limited scalability (Blazor Server circuit model)
+🚀 Future Improvements
+Integrate real-time APIs (ExchangeRate API, CoinGecko)
+Add JWT authentication
+Deploy to cloud (Azure / AWS)
+Add unit + integration tests
 📊 Dashboard
 Good morning/afternoon/evening greeting
 4 stat cards (currencies, crypto, favorites, alerts)
