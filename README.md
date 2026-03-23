@@ -10,7 +10,7 @@ Frontend |	Blazor Server (C# components)
 Database |	SQLite via EF Core 8
 Auth |	BCrypt password hashing, session-based
 Charts |	Pure SVG — zero JavaScript
-Styling	Custom CSS (dark terminal theme)
+Styling	| Custom CSS (dark terminal theme)
 ----------
 Quick Start
 Prerequisites
