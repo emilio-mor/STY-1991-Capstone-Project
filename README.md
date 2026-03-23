@@ -96,6 +96,11 @@ Integrate real-time APIs (ExchangeRate API, CoinGecko)
 Add JWT authentication
 Deploy to cloud (Azure / AWS)
 Add unit + integration tests
+🛠️ Contributing
+Fork the repo
+Create a feature branch
+Commit and push changes
+Open a pull request
 📊 Dashboard
 Good morning/afternoon/evening greeting
 4 stat cards (currencies, crypto, favorites, alerts)
