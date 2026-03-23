@@ -87,6 +87,10 @@ Blazor Server chosen for full C# stack (no JS dependency)
 SVG charts instead of Chart.js → zero JS, full control
 Scoped AuthService replaces cookie-based auth
 SQLite for simplicity and portability
+🚧 Limitations
+Uses mock exchange rate data (no live API yet)
+No persistent login across browser sessions
+Limited scalability (Blazor Server circuit model)
 📊 Dashboard
 Good morning/afternoon/evening greeting
 4 stat cards (currencies, crypto, favorites, alerts)
