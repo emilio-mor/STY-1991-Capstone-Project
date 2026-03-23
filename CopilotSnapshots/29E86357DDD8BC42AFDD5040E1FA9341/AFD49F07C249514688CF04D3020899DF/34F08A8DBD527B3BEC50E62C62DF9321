@@ -1,0 +1,92 @@
+﻿@* Full-width SVG line chart — pure Blazor, zero JavaScript *@
+
+<div class="svg-chart-wrap">
+    <svg viewBox="0 0 @W @H" preserveAspectRatio="none"
+         style="width:100%;height:240px;overflow:visible">
+        <defs>
+            <linearGradient id="chartGrad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="@LineColor" stop-opacity="0.25" />
+                <stop offset="100%" stop-color="@LineColor" stop-opacity="0" />
+            </linearGradient>
+        </defs>
+
+        @if (Data != null && Data.Count > 1)
+        {
+            <!-- Grid lines -->
+            @for (int i = 0; i <= 4; i++)
+            {
+                double y = Pad + (H - 2*Pad) * i / 4;
+                <line x1="@Pad" y1="@(y.ToString(\"F0\"))" x2="@(W-Pad)" y2="@(y.ToString(\"F0\"))"
+                      stroke="rgba(255,255,255,0.04)" stroke-width="1" />
+            }
+
+            <!-- Y labels -->
+            @for (int i = 0; i <= 4; i++)
+            {
+                double y  = Pad + (H - 2*Pad) * i / 4;
+                double rv = _max - (_max - _min) * i / 4;
+                <text x="@(Pad - 6)" y="@((y+4).ToString(\"F0\"))"
+                      text-anchor="end" font-size="9" fill="#4a5270"
+                      font-family="'DM Mono',monospace">@rv.ToString("F4")</text>
+            }
+
+            <!-- X labels -->
+            @for (int i = 0; i < _labelIndices.Count; i++)
+            {
+                int idx = _labelIndices[i];
+                if (idx < Data.Count)
+                {
+                    double x = Px(idx);
+                    <text x="@(x.ToString(\"F0\"))" y="@((H - Pad + 14).ToString(\"F0\"))"
+                          text-anchor="middle" font-size="9" fill="#4a5270"
+                          font-family="'DM Mono',monospace">@Data[idx].Label</text>
+                }
+            }
+
+            <!-- Area fill -->
+            <polygon points="@Pad,@(H-Pad) @PolyPoints @(W-Pad),@(H-Pad)"
+                     fill="url(#chartGrad)" />
+
+            <!-- Line -->
+            <polyline points="@PolyPoints"
+                      fill="none" stroke="@LineColor" stroke-width="2"
+                      stroke-linejoin="round" stroke-linecap="round" />
+
+            <!-- Last point dot -->
+            <circle cx='@(Px(Data.Count-1).ToString("F0"))'
+                    cy='@(Py(Data.Count-1).ToString("F0"))'
+                    r="4" fill="@LineColor" stroke="@LineColor" stroke-width="2" />
+        }
+    </svg>
+</div>
+
+@code {
+    [Parameter] public List<TrendPoint> Data { get; set; } = new();
+    [Parameter] public bool             Up   { get; set; } = true;
+
+    private const int W = 800, H = 240, Pad = 52;
+    private string LineColor => Up ? "#00e8b8" : "#ff5f5f";
+
+    private double _min, _max;
+    private List<int> _labelIndices = new();
+
+    protected override void OnParametersSet()
+    {
+        if (Data == null || Data.Count < 2) return;
+        _min = Data.Min(d => d.Rate);
+        _max = Data.Max(d => d.Rate);
+        if (_min == _max) { _min -= 0.001; _max += 0.001; }
+
+        // Pick ~6 evenly-spaced label positions
+        _labelIndices = Enumerable.Range(0, 7)
+            .Select(i => (int)Math.Round((double)i * (Data.Count - 1) / 6))
+            .Distinct().ToList();
+    }
+
+    private double Px(int i) => Pad + (double)i * (W - 2*Pad) / (Data.Count - 1);
+    private double Py(int i) => Pad + (1 - (Data[i].Rate - _min) / (_max - _min)) * (H - 2*Pad);
+
+    private string PolyPoints =>
+        string.Join(" ", Enumerable.Range(0, Data?.Count ?? 0)
+            .Select(i => $"{Px(i):F1},{Py(i):F1}"));
+}

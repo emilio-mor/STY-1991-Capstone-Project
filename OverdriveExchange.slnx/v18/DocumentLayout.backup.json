@@ -1,0 +1,71 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Users\\em_jo\\OneDrive\\Documents\\Cambrian\\STY1991 - Software Engineering Concepts\\Project\\OverdriveExchange\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{6D892F23-F65E-4B12-573E-4D223D00FDE8}|OverdriveExchange.csproj|c:\\users\\em_jo\\onedrive\\documents\\cambrian\\sty1991 - software engineering concepts\\project\\overdriveexchange\\components\\shared\\svglinechart.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{6D892F23-F65E-4B12-573E-4D223D00FDE8}|OverdriveExchange.csproj|solutionrelative:components\\shared\\svglinechart.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{6D892F23-F65E-4B12-573E-4D223D00FDE8}|OverdriveExchange.csproj|c:\\users\\em_jo\\onedrive\\documents\\cambrian\\sty1991 - software engineering concepts\\project\\overdriveexchange\\components\\pages\\favorites.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{6D892F23-F65E-4B12-573E-4D223D00FDE8}|OverdriveExchange.csproj|solutionrelative:components\\pages\\favorites.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{6D892F23-F65E-4B12-573E-4D223D00FDE8}|OverdriveExchange.csproj|c:\\users\\em_jo\\onedrive\\documents\\cambrian\\sty1991 - software engineering concepts\\project\\overdriveexchange\\components\\pages\\dashboard.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{6D892F23-F65E-4B12-573E-4D223D00FDE8}|OverdriveExchange.csproj|solutionrelative:components\\pages\\dashboard.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 0,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "SvgLineChart.razor",
+              "DocumentMoniker": "C:\\Users\\em_jo\\OneDrive\\Documents\\Cambrian\\STY1991 - Software Engineering Concepts\\Project\\OverdriveExchange\\Components\\Shared\\SvgLineChart.razor",
+              "RelativeDocumentMoniker": "Components\\Shared\\SvgLineChart.razor",
+              "ToolTip": "C:\\Users\\em_jo\\OneDrive\\Documents\\Cambrian\\STY1991 - Software Engineering Concepts\\Project\\OverdriveExchange\\Components\\Shared\\SvgLineChart.razor",
+              "RelativeToolTip": "Components\\Shared\\SvgLineChart.razor",
+              "ViewState": "AgIAAAUAAAAAAAAAAAAvwBMAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2026-03-16T21:49:09.777Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "Favorites.razor",
+              "DocumentMoniker": "C:\\Users\\em_jo\\OneDrive\\Documents\\Cambrian\\STY1991 - Software Engineering Concepts\\Project\\OverdriveExchange\\Components\\Pages\\Favorites.razor",
+              "RelativeDocumentMoniker": "Components\\Pages\\Favorites.razor",
+              "ToolTip": "C:\\Users\\em_jo\\OneDrive\\Documents\\Cambrian\\STY1991 - Software Engineering Concepts\\Project\\OverdriveExchange\\Components\\Pages\\Favorites.razor",
+              "RelativeToolTip": "Components\\Pages\\Favorites.razor",
+              "ViewState": "AgIAACAAAAAAAAAAAAAcwC4AAAAkAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2026-03-16T21:46:46.384Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "Dashboard.razor",
+              "DocumentMoniker": "C:\\Users\\em_jo\\OneDrive\\Documents\\Cambrian\\STY1991 - Software Engineering Concepts\\Project\\OverdriveExchange\\Components\\Pages\\Dashboard.razor",
+              "RelativeDocumentMoniker": "Components\\Pages\\Dashboard.razor",
+              "ToolTip": "C:\\Users\\em_jo\\OneDrive\\Documents\\Cambrian\\STY1991 - Software Engineering Concepts\\Project\\OverdriveExchange\\Components\\Pages\\Dashboard.razor",
+              "RelativeToolTip": "Components\\Pages\\Dashboard.razor",
+              "ViewState": "AgIAAD4AAAAAAAAAAAAcwBUAAAAcAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2026-03-16T21:27:44.492Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

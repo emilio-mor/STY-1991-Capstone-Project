@@ -1,0 +1,163 @@
+﻿@page "/"
+@inject AuthService Auth
+@inject IExchangeRateService Rates
+@inject IFavoritesService Favs
+@inject NavigationManager Nav
+
+<PageTitle>Dashboard — Overdrive Exchange</PageTitle>
+
+<div class="page">
+    <!-- Header -->
+    <div class="page-header">
+        <div>
+            <h1>Good @_greet, @Auth.FullName?.Split(' ')[0] 👋</h1>
+            <p class="page-sub">Market overview · @DateTime.Now.ToString("dddd, MMMM d")</p>
+        </div>
+        <div class="live-pill">
+            <span class="live-dot"></span>LIVE
+        </div>
+    </div>
+
+    <!-- Stat cards -->
+    <div class="stats-grid">
+        @foreach (var s in _stats)
+        {
+            <div class="stat-card">
+                <div class="stat-icon">@s.Icon</div>
+                <div class="stat-label">@s.Label</div>
+                <div class="stat-value">@s.Value</div>
+                <div class="stat-sub">@s.Sub</div>
+            </div>
+        }
+    </div>
+
+    <!-- Two-column grid -->
+    <div class="dash-grid">
+        <!-- Forex -->
+        <div class="card">
+            <div class="card-hdr">
+                <span class="section-label">🌍 Top Forex Pairs</span>
+                <a href="/converter" class="card-link">Convert →</a>
+            </div>
+            @foreach (var p in _forex)
+            {
+                <div class="rate-row" @onclick="()=>GoTrend(p.BaseCurrency,p.TargetCurrency)">
+                    <div class="rate-flags">@p.BaseFlag@p.TargetFlag</div>
+                    <div class="rate-info">
+                        <div class="rate-pair">@($"{p.BaseCurrency}/{p.TargetCurrency}")</div>
+                        <div class="rate-name">@p.TargetName</div>
+                    </div>
+                    <Sparkline Data="@p.SparkData" Up="@(p.ChangePercent>=0)" />
+                    <div class="rate-vals">
+                        <div class="rate-val">@p.Rate.ToString("F4")</div>
+                        <div class="@(p.ChangePercent>=0?"chg-up":"chg-dn")">
+                            @(p.ChangePercent>=0?"▲":"▼")@Math.Abs(p.ChangePercent).ToString("F2")%
+                        </div>
+                    </div>
+                    <button class="star-btn @(IsFav(p.TargetCurrency)?"starred":"")"
+                            @onclick:stopPropagation
+                            @onclick="()=>ToggleFav(p.TargetCurrency,p.TargetName,p.TargetFlag)">★</button>
+                </div>
+            }
+        </div>
+
+        <!-- Crypto -->
+        <div class="card">
+            <div class="card-hdr">
+                <span class="section-label">🪙 Crypto vs USD</span>
+                <span class="card-note">24h change</span>
+            </div>
+            @foreach (var c in _crypto)
+            {
+                <div class="rate-row">
+                    <div class="crypto-icon" style="background:@(c.Color)22;color:@c.Color">@c.Icon</div>
+                    <div class="rate-info">
+                        <div class="rate-pair">@c.Symbol/USD</div>
+                        <div class="rate-name">@c.Name · $@c.MarketCapBillions.ToString("F0")B cap</div>
+                    </div>
+                    <div class="rate-vals">
+                        <div class="rate-val">$@c.PriceUsd.ToString("N2")</div>
+                        <div class="@(c.ChangePercent>=0?"chg-up":"chg-dn")">
+                            @(c.ChangePercent>=0?"▲":"▼")@Math.Abs(c.ChangePercent).ToString("F2")%
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+
+    <!-- Favorites strip -->
+    @if (_favorites.Any())
+    {
+        <div class="card mt-4">
+            <div class="card-hdr">
+                <span class="section-label">★ Your Favorites</span>
+                <a href="/favorites" class="card-link">Manage →</a>
+            </div>
+            <div class="fav-strip">
+                @foreach (var f in _favorites)
+                {
+                    <div class="fav-chip" @onclick='() => GoTrend("USD", f.CurrencyCode)'>
+                        <span class="fav-flag">@f.Flag</span>
+                        <span class="fav-code">@f.CurrencyCode</span>
+                        <span class="fav-rate">@Rates.GetRate("USD",f.CurrencyCode).ToString("F4")</span>
+                    </div>
+                }
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    private List<ForexRate>      _forex     = new();
+    private List<CryptoRate>     _crypto    = new();
+    private List<FavoriteCurrency> _favorites = new();
+    private HashSet<string>      _favCodes  = new();
+    private string               _greet     = "day";
+
+    private record StatCard(string Icon, string Label, string Value, string Sub);
+    private List<StatCard> _stats = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        _greet  = DateTime.Now.Hour < 12 ? "morning" : DateTime.Now.Hour < 18 ? "afternoon" : "evening";
+        _forex  = Rates.GetTopForex();
+        _crypto = Rates.GetTopCrypto();
+
+        if (Auth.UserId.HasValue)
+        {
+            _favorites = await Favs.GetAsync(Auth.UserId.Value);
+            _favCodes  = _favorites.Select(f => f.CurrencyCode).ToHashSet();
+        }
+
+        _stats = new()
+        {
+            new("💱", "World Currencies", "53",              "Tracked globally"),
+            new("₿",  "Crypto Markets",  "5",               "By market cap"),
+            new("★",  "Your Favorites",  _favorites.Count.ToString(), "Quick access"),
+            new("🔔", "Active Alerts",   _forex.Count.ToString(),     "Rate monitoring"),
+        };
+    }
+
+    private bool IsFav(string code) => _favCodes.Contains(code);
+
+    private async Task ToggleFav(string code, string name, string flag)
+    {
+        if (!Auth.UserId.HasValue) return;
+        if (_favCodes.Contains(code))
+        {
+            await Favs.RemoveAsync(Auth.UserId.Value, code);
+            _favCodes.Remove(code);
+            _favorites.RemoveAll(f => f.CurrencyCode == code);
+        }
+        else
+        {
+            await Favs.AddAsync(Auth.UserId.Value, code, name, flag);
+            _favCodes.Add(code);
+            _favorites.Add(new FavoriteCurrency { CurrencyCode=code, CurrencyName=name, Flag=flag });
+        }
+    }
+
+    private void GoTrend(string b, string t) =>
+        Nav.NavigateTo($"/trends?from={b}&to={t}");
+}
