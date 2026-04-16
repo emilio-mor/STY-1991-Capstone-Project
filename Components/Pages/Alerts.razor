@@ -1,0 +1,158 @@
+@page "/alerts"
+@inject AuthService Auth
+@inject IAlertService AlertSvc
+@inject IExchangeRateService Rates
+
+<PageTitle>Alerts — Overdrive Exchange</PageTitle>
+
+<div class="page">
+    <div class="page-header">
+        <div><h1>Rate Alerts</h1><p class="page-sub">Get notified when live rates hit your targets</p></div>
+        @if (_unread > 0) { <div class="unread-pill">@_unread unread</div> }
+    </div>
+
+    <div class="card mb-4">
+        <div class="section-label mb-3">+ Create New Alert</div>
+        <EditForm Model="_newAlert" OnValidSubmit="Create">
+            <DataAnnotationsValidator />
+            <div class="alert-form-grid">
+                <div class="form-group">
+                    <label class="conv-label">Base</label>
+                    <InputSelect @bind-Value="_newAlert.BaseCurrency" class="fx-select">
+                        @foreach (var c in _currencies) { <option value="@c.Code">@c.Flag @c.Code</option> }
+                    </InputSelect>
+                </div>
+                <div class="form-group">
+                    <label class="conv-label">Target</label>
+                    <InputSelect @bind-Value="_newAlert.TargetCurrency" class="fx-select">
+                        @foreach (var c in _currencies) { <option value="@c.Code">@c.Flag @c.Code</option> }
+                    </InputSelect>
+                </div>
+                <div class="form-group">
+                    <label class="conv-label">Condition</label>
+                    <InputSelect @bind-Value="_newAlert.Condition" class="fx-select">
+                        <option value="@AlertCondition.Above">▲ Goes Above</option>
+                        <option value="@AlertCondition.Below">▼ Goes Below</option>
+                    </InputSelect>
+                </div>
+                <div class="form-group">
+                    <label class="conv-label">Target Rate</label>
+                    <InputNumber @bind-Value="_newAlert.TargetRate" class="fx-input" placeholder="e.g. 1.1000" />
+                    <ValidationMessage For="()=>_newAlert.TargetRate" class="field-err" />
+                </div>
+                <div class="form-group align-end">
+                    <button type="submit" class="convert-btn">Set Alert 🔔</button>
+                </div>
+            </div>
+        </EditForm>
+    </div>
+
+    <div class="alerts-grid">
+        <div class="card">
+            <div class="card-hdr mb-3"><span class="section-label">Active Alerts (@_alerts.Count(a=>!a.IsTriggered))</span></div>
+            @if (!_alerts.Any())
+            {
+                <div class="empty-state"><div class="empty-icon">🔔</div><div class="empty-title">No alerts set</div></div>
+            }
+            else
+            {
+                @foreach (var a in _alerts)
+                {
+                    var cur = _liveRates.GetValueOrDefault($"{a.BaseCurrency}/{a.TargetCurrency}", 0);
+                    <div class="alert-item @(a.IsTriggered?"triggered":"")">
+                        <div class="alert-top">
+                            <span class="alert-pair-name">@a.BaseCurrency / @a.TargetCurrency</span>
+                            <span class="status-badge @(a.IsTriggered?"st-done":"st-live")">@(a.IsTriggered?"✓ Triggered":"● Active")</span>
+                        </div>
+                        <div class="alert-cond">
+                            <span class="cond-badge @(a.Condition==AlertCondition.Above?"cond-up":"cond-dn")">
+                                @(a.Condition==AlertCondition.Above?"▲ ABOVE":"▼ BELOW")
+                            </span>
+                            <span class="cond-rate mono">@a.TargetRate.ToString("F4")</span>
+                        </div>
+                        <div class="alert-meta">
+                            Live: <span class="mono">@(cur>0?cur.ToString("F6"):"…")</span> ·
+                            Set @a.CreatedAt.ToLocalTime().ToString("MMM d, HH:mm")
+                        </div>
+                        <button class="sm-btn sm-danger mt-2" @onclick="()=>Delete(a.Id)">Delete</button>
+                    </div>
+                }
+            }
+        </div>
+
+        <div class="card">
+            <div class="card-hdr mb-3">
+                <span class="section-label">Notification Log</span>
+                @if (_logs.Any()) { <button class="card-link-btn" @onclick="MarkAllRead">Mark all read</button> }
+            </div>
+            @if (!_logs.Any())
+            {
+                <div class="empty-state"><div class="empty-icon">📭</div><div class="empty-title">No notifications yet</div></div>
+            }
+            else
+            {
+                @foreach (var l in _logs)
+                {
+                    <div class="log-item @(!l.IsRead?"log-unread":"")">
+                        <span class="log-bell">🔔</span>
+                        <div class="log-body"><div class="log-msg">@l.Message</div><div class="log-time">@l.CreatedAt.ToLocalTime().ToString("MMM d, HH:mm")</div></div>
+                        @if (!l.IsRead) { <span class="unread-dot"></span> }
+                    </div>
+                }
+            }
+        </div>
+    </div>
+</div>
+
+@code {
+    private List<RateAlert>       _alerts    = new();
+    private List<NotificationLog> _logs      = new();
+    private List<CurrencyInfo>    _currencies= new();
+    private Dictionary<string,double> _liveRates = new();
+    private int              _unread;
+    private CreateAlertModel _newAlert = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        _currencies = Rates.GetAllCurrencies();
+        await Reload();
+    }
+
+    private async Task Reload()
+    {
+        if (!Auth.UserId.HasValue) return;
+        _alerts = await AlertSvc.GetAlertsAsync(Auth.UserId.Value);
+        _logs   = await AlertSvc.GetLogsAsync(Auth.UserId.Value);
+        _unread = await AlertSvc.GetUnreadCountAsync(Auth.UserId.Value);
+
+        // Fetch live rates for all alert pairs
+        foreach (var a in _alerts.Where(x => !x.IsTriggered))
+        {
+            var key = $"{a.BaseCurrency}/{a.TargetCurrency}";
+            if (!_liveRates.ContainsKey(key))
+                _liveRates[key] = Math.Round(await Rates.GetRateAsync(a.BaseCurrency, a.TargetCurrency), 6);
+        }
+    }
+
+    private async Task Create()
+    {
+        if (!Auth.UserId.HasValue) return;
+        await AlertSvc.CreateAsync(Auth.UserId.Value, _newAlert);
+        _newAlert = new CreateAlertModel();
+        await Reload();
+    }
+
+    private async Task Delete(int id)
+    {
+        if (!Auth.UserId.HasValue) return;
+        await AlertSvc.DeleteAsync(Auth.UserId.Value, id);
+        await Reload();
+    }
+
+    private async Task MarkAllRead()
+    {
+        if (!Auth.UserId.HasValue) return;
+        await AlertSvc.MarkAllReadAsync(Auth.UserId.Value);
+        await Reload();
+    }
+}
