@@ -1,3 +1,4 @@
+main
 @inherits LayoutComponentBase
 @inject AuthService Auth
 @inject NavigationManager Nav
@@ -26,4 +27,14 @@ else
         // Unsubscribe when the component is disposed
         Auth.OnChange -= StateHasChanged;
     }
+
+{
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "Microsoft.AspNetCore": "Warning"
+    }
+  },
+  "AllowedHosts": "*"
+
 }
