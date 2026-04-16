@@ -1,3 +1,33 @@
+main
+@inherits LayoutComponentBase
+@inject AuthService Auth
+@inject NavigationManager Nav
+
+@if (!Auth.IsAuth)
+{
+    <Login /> @* Show login component if the user is not authenticated *@
+}
+else
+{
+    <div class="shell">
+        <Sidebar /> @* Sidebar with navigation, user info, etc. *@
+        <main>@Body</main> @* Main content area for pages *@
+    </div>
+}
+
+@code {
+    protected override void OnInitialized()
+    {
+        // Subscribe to AuthService changes to refresh UI
+        Auth.OnChange += StateHasChanged;
+    }
+
+    public void Dispose()
+    {
+        // Unsubscribe when the component is disposed
+        Auth.OnChange -= StateHasChanged;
+    }
+
 {
   "Logging": {
     "LogLevel": {
@@ -6,4 +36,5 @@
     }
   },
   "AllowedHosts": "*"
+
 }

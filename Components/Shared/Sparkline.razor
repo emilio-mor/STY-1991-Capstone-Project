@@ -1,0 +1,48 @@
+@* Inline SVG sparkline — no JS required *@
+
+<svg width="70" height="28" style="overflow:visible">
+    <defs>
+        <linearGradient id="sg@(Up?"u":"d")" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="@Color" stop-opacity="0.3" />
+            <stop offset="100%" stop-color="@Color" stop-opacity="0" />
+        </linearGradient>
+    </defs>
+    @if (Data != null && Data.Count > 1)
+    {
+        <polygon points="@AreaPoints" fill="url(#sg@(Up?"u":"d"))" />
+        <polyline points="@LinePoints" fill="none" stroke="@Color" stroke-width="1.5" stroke-linejoin="round" />
+    }
+</svg>
+
+@code {
+    [Parameter] public List<double> Data { get; set; } = new();
+    [Parameter] public bool         Up   { get; set; } = true;
+
+    private const int W = 70, H = 28;
+    private string Color => Up ? "#00e8b8" : "#ff5f5f";
+
+    private string LinePoints
+    {
+        get
+        {
+            if (Data == null || Data.Count < 2) return "";
+            var min = Data.Min(); var max = Data.Max();
+            var range = max - min == 0 ? 1 : max - min;
+            return string.Join(" ", Data.Select((v, i) =>
+                $"{i * W / (Data.Count - 1):F1},{H - (v - min) / range * H:F1}"));
+        }
+    }
+
+    private string AreaPoints
+    {
+        get
+        {
+            if (Data == null || Data.Count < 2) return "";
+            var min = Data.Min(); var max = Data.Max();
+            var range = max - min == 0 ? 1 : max - min;
+            var pts = string.Join(" ", Data.Select((v, i) =>
+                $"{i * W / (Data.Count - 1):F1},{H - (v - min) / range * H:F1}"));
+            return $"0,{H} {pts} {W},{H}";
+        }
+    }
+}

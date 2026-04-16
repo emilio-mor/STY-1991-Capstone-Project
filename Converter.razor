@@ -1,3 +1,145 @@
+main
+@page "/converter"
+@inject IExchangeRateService Rates
+
+<PageTitle>Converter — Overdrive Exchange</PageTitle>
+
+<div class="page">
+    <div class="page-header">
+        <div>
+            <h1>Currency Converter</h1>
+            <p class="page-sub">Convert between 53 world currencies instantly</p>
+        </div>
+    </div>
+
+    <div class="card conv-card">
+        <!-- Inputs grid -->
+        <div class="conv-grid">
+            <!-- From -->
+            <div class="conv-side">
+                <label class="conv-label">From</label>
+                <select class="fx-select" @bind="_from">
+                    @foreach (var c in _currencies)
+                    {
+                        <option value="@c.Code">@c.Flag @c.Code – @c.Name</option>
+                    }
+                </select>
+                <input type="number" class="fx-input" @bind="_amount" @bind:event="oninput"
+                       placeholder="1.00" min="0" step="any" />
+            </div>
+
+            <!-- Swap -->
+            <div class="conv-swap">
+                <button class="swap-btn" @onclick="Swap">⇄</button>
+            </div>
+
+            <!-- To -->
+            <div class="conv-side">
+                <label class="conv-label">To</label>
+                <select class="fx-select" @bind="_to">
+                    @foreach (var c in _currencies)
+                    {
+                        <option value="@c.Code">@c.Flag @c.Code – @c.Name</option>
+                    }
+                </select>
+                <div class="fx-result">
+                    @if (_amount > 0)
+                    {
+                        <span>@Result.ToString("N6")</span>
+                    }
+                    else
+                    {
+                        <span class="fx-placeholder">—</span>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <button class="convert-btn" @onclick="DoConvert">Convert →</button>
+
+        <!-- Result box -->
+        @if (_result != null && _amount > 0)
+        {
+            <div class="result-box">
+                <div class="result-main">
+                    <span class="res-from">@_result.FromFlag @_amount.ToString("N2") @_result.FromCode</span>
+                    <span class="res-eq">=</span>
+                    <span class="res-to">@_result.ToFlag @_result.Result.ToString("N4") @_result.ToCode</span>
+                </div>
+                <div class="result-rates">
+                    <span>1 @_result.FromCode = <b>@_result.Rate.ToString("F6")</b> @_result.ToCode</span>
+                    <span>1 @_result.ToCode = <b>@_result.Inverse.ToString("F6")</b> @_result.FromCode</span>
+                </div>
+                <div class="result-time">Updated @_result.At.ToLocalTime().ToString("HH:mm:ss, MMM dd yyyy")</div>
+            </div>
+        }
+
+        <!-- Quick reference table -->
+        @if (_result != null)
+        {
+            <div class="section-label mt-4 mb-2">Quick Reference</div>
+            <div class="quick-table">
+                @foreach (var m in new[] { 1,5,10,25,50,100,500,1000 })
+                {
+                    <div class="quick-row">
+                        <span>@m @_from</span>
+                        <span>→</span>
+                        <span>@((m * _result.Rate).ToString("N4")) @_to</span>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+
+    <!-- Popular pairs -->
+    <div class="card mt-4">
+        <div class="section-label mb-3">Popular Pairs</div>
+        <div class="pairs-wrap">
+            @foreach (var (f,t) in _popularPairs)
+            {
+                <button class="pair-chip @(_from==f&&_to==t?"pair-active":"")"
+                        @onclick="()=>SetPair(f,t)">@f / @t</button>
+            }
+        </div>
+    </div>
+</div>
+
+@code {
+    private List<CurrencyInfo> _currencies = new();
+    private string  _from   = "USD";
+    private string  _to     = "EUR";
+    private double  _amount = 1;
+    private ConversionResult? _result;
+
+    private double Result => _result?.Rate * _amount ?? 0;
+
+    private static readonly (string, string)[] _popularPairs =
+    {
+        ("USD","EUR"),("USD","GBP"),("USD","JPY"),("USD","CAD"),
+        ("BRL","HNL"),("EUR","BRL"),("GBP","JPY"),("USD","BRL"),("HNL","USD")
+    };
+
+    protected override void OnInitialized()
+    {
+        _currencies = Rates.GetAllCurrencies();
+        DoConvert();
+    }
+
+    private void DoConvert()
+    {
+        if (_amount > 0)
+            _result = Rates.Convert(_from, _to, _amount);
+    }
+
+    private void Swap()
+    {
+        (_from, _to) = (_to, _from);
+        DoConvert();
+    }
+
+    private void SetPair(string f, string t) { _from = f; _to = t; DoConvert(); }
+}
+=======
 # Overdrive Exchange — Blazor Server + C# Backend
 
 A full-stack real-time exchange rate application built entirely with **C# / ASP.NET Core 8** and **Blazor Server**.
@@ -187,3 +329,4 @@ builder.Services.AddHttpClient<IExchangeRateService, ExchangeRateService>();
 ---
 
 *Overdrive Exchange — 100% C# · Blazor Server · EF Core · SQLite · BCrypt · Pure SVG Charts*
+

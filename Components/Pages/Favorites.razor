@@ -1,0 +1,95 @@
+@page "/favorites"
+@inject AuthService Auth
+@inject IFavoritesService FavSvc
+@inject IExchangeRateService Rates
+@inject NavigationManager Nav
+
+<PageTitle>Favorites — Overdrive Exchange</PageTitle>
+
+<div class="page">
+    <div class="page-header">
+        <div><h1>Favorite Currencies</h1><p class="page-sub">Pin currencies for quick access</p></div>
+    </div>
+
+    <div class="fav-layout">
+        <div class="card">
+            <div class="card-hdr mb-3"><span class="section-label">★ Your Favorites (@_favorites.Count)</span></div>
+            @if (!_favorites.Any())
+            {
+                <div class="empty-state"><div class="empty-icon">★</div><div class="empty-title">No favorites yet</div><div class="empty-sub">Add from the list on the right</div></div>
+            }
+            else
+            {
+                @foreach (var f in _favorites)
+                {
+                    var rate = _rates.GetValueOrDefault(f.CurrencyCode, 0);
+                    <div class="fav-item">
+                        <span class="fav-flag-lg">@f.Flag</span>
+                        <div class="fav-detail"><div class="fav-code-lg">@f.CurrencyCode</div><div class="fav-name-lg">@f.CurrencyName</div></div>
+                        <div class="fav-rate-lg">@(rate > 0 ? rate.ToString("F4") : "…")</div>
+                        <div class="fav-actions">
+                            <button class="sm-btn sm-outline" @onclick='() => Nav.NavigateTo("/converter?from=USD&to=" + f.CurrencyCode)'>Convert</button>
+                            <button class="sm-btn sm-outline" @onclick='() => Nav.NavigateTo("/trends?from=USD&to=" + f.CurrencyCode)'>Trend</button>
+                            <button class="sm-btn sm-danger" @onclick="()=>Remove(f.CurrencyCode)">✕</button>
+                        </div>
+                    </div>
+                }
+            }
+        </div>
+
+        <div class="card">
+            <div class="card-hdr mb-3"><span class="section-label">+ Add Currency</span></div>
+            <input class="fx-search" placeholder="🔍 Search by code or name…" @bind="_search" @bind:event="oninput" />
+            <div class="cur-browser">
+                @foreach (var c in Filtered)
+                {
+                    var isFav = _favCodes.Contains(c.Code);
+                    <div class="cur-item @(isFav?"cur-added":"")">
+                        <span class="ci-flag">@c.Flag</span>
+                        <div class="ci-info"><span class="ci-code">@c.Code</span><span class="ci-name">@c.Name</span></div>
+                        @if (isFav) { <span class="added-badge">★ Added</span> }
+                        else { <button class="sm-btn sm-add" @onclick="()=>Add(c)">+ Add</button> }
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private List<FavoriteCurrency>    _favorites = new();
+    private HashSet<string>           _favCodes  = new();
+    private Dictionary<string,double> _rates     = new();
+    private string                    _search    = "";
+
+    private IEnumerable<CurrencyInfo> Filtered => Rates.GetAllCurrencies()
+        .Where(c => string.IsNullOrEmpty(_search)
+            || c.Code.Contains(_search, StringComparison.OrdinalIgnoreCase)
+            || c.Name.Contains(_search, StringComparison.OrdinalIgnoreCase));
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (!Auth.UserId.HasValue) return;
+        _favorites = await FavSvc.GetAsync(Auth.UserId.Value);
+        _favCodes  = _favorites.Select(f => f.CurrencyCode).ToHashSet();
+        foreach (var f in _favorites)
+            _rates[f.CurrencyCode] = Math.Round(await Rates.GetRateAsync("USD", f.CurrencyCode), 4);
+    }
+
+    private async Task Add(CurrencyInfo c)
+    {
+        if (!Auth.UserId.HasValue) return;
+        await FavSvc.AddAsync(Auth.UserId.Value, c.Code, c.Name, c.Flag);
+        _favorites.Add(new FavoriteCurrency { CurrencyCode=c.Code, CurrencyName=c.Name, Flag=c.Flag });
+        _favCodes.Add(c.Code);
+        _rates[c.Code] = Math.Round(await Rates.GetRateAsync("USD", c.Code), 4);
+    }
+
+    private async Task Remove(string code)
+    {
+        if (!Auth.UserId.HasValue) return;
+        await FavSvc.RemoveAsync(Auth.UserId.Value, code);
+        _favorites.RemoveAll(f => f.CurrencyCode == code);
+        _favCodes.Remove(code);
+    }
+}
