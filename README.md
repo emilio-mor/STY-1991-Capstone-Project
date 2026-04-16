@@ -1,169 +1,122 @@
-# STY-1991-Capstone-Project
-Software Engineering Concepts Project
-Overdrive Exchange — Blazor Server + C# Backend
-A full-stack real-time exchange rate application built entirely with C# / ASP.NET Core 8 and Blazor Server.
+# Overdrive Exchange — Blazor Server + Live API
 
-Tech Stack
-Layer	Technology
-Backend	| C# ASP.NET Core 8
-Frontend |	Blazor Server (C# components)
-Database |	SQLite via EF Core 8
-Auth |	BCrypt password hashing, session-based
-Charts |	Pure SVG — zero JavaScript
-Styling	| Custom CSS (dark terminal theme)
-----------
-Quick Start
-Prerequisites
-[.NET 8 SDK](https://dotnet.microsoft.com/download/dotnet/8)
-----------
-Run
-bash
-git clone / copy project to folder
+Full-stack real-time exchange rate app built with **C# ASP.NET Core 8** and **Blazor Server**.  
+Rates are fetched live from **exchangerate.host** (free tier) and cached for 10 minutes.
+
+---
+
+## Quick Start
+
+### 1 — Get a free API key
+
+Sign up at **https://exchangerate.host** (free plan, no credit card).  
+Copy your Access Key.
+
+### 2 — Add the key to appsettings.json
+
+```json
+"ExchangeRates": {
+  "ApiKey": "PASTE_YOUR_KEY_HERE",
+  "BaseUrl": "https://api.exchangerate.host"
+}
+```
+
+### 3 — Run
+
+```bash
 cd OverdriveExchange
-
 dotnet restore
 dotnet run
-Open http://localhost:5000
---------------
-Demo Credentials
-Field |	Value
-Email |	demo@overdriveexchange.app
-Username |	demo
-Password |	demo123
-----------
-Project Structure
+```
+
+Open **http://localhost:5000** — login with `demo` / `demo123`.
+
+---
+
+## Architecture
+
+```
 OverdriveExchange/
-├── OverdriveExchange.csproj                    ← Project file (NuGet packages)
-├── Program.cs                        ← App startup, DI, routing
-├── appsettings.json
+├── Program.cs                    ← DI, auth, routing (clean, ~50 lines)
+├── appsettings.json              ← DB + API key config
 │
-├── Models/
-│   └── Models.cs                     ← All domain models + ViewModels
-│
-├── Data/
-│   └── AppDbContext.cs               ← EF Core DbContext + DbSeeder
+├── Models/Models.cs              ← All domain models (one file)
+├── Data/AppDbContext.cs          ← EF Core SQLite + seeder
 │
 ├── Services/
-│   └── Services.cs                   ← All services:
-│                                       • AuthService (login, register)
-│                                       • ExchangeRateService (53 currencies)
-│                                       • FavoritesService
-│                                       • AlertService
-│                                       • AlertMonitorService (background)
+│   ├── Services.cs               ← All services in one file:
+│   │                               AuthService, RateCache,
+│   │                               ExchangeRateService (LIVE API),
+│   │                               FavoritesService, AlertService,
+│   │                               AlertMonitorService (background)
+│   └── AuthEndpoints.cs          ← HTTP login/logout handlers
 │
 ├── Components/
-│   ├── App.razor                     ← Root component + Router
-│   ├── _Imports.razor                ← Global usings
-│   │
-│   ├── Layout/
-│   │   └── MainLayout.razor          ← Sidebar, nav, auth guard
-│   │
+│   ├── App.razor                 ← Router
+│   ├── _Imports.razor            ← Global usings
+│   ├── Layout/MainLayout.razor   ← Sidebar + auth guard
 │   ├── Pages/
-│   │   ├── Login.razor               ← Login + Register (tabs)
-│   │   ├── Dashboard.razor           ← Forex + Crypto + Favorites
-│   │   ├── Converter.razor           ← Currency converter
-│   │   ├── Trends.razor              ← SVG chart + history table
-│   │   ├── Favorites.razor           ← Manage favorites
-│   │   └── Alerts.razor              ← Rate alerts + notification log
-│   │
+│   │   ├── Login.razor           ← Login + Register
+│   │   ├── Dashboard.razor       ← Live forex overview
+│   │   ├── Converter.razor       ← Live currency converter
+│   │   ├── Trends.razor          ← Rate chart + history
+│   │   ├── Favorites.razor       ← Saved currencies
+│   │   └── Alerts.razor          ← Rate alert management
 │   └── Shared/
-│       ├── Sparkline.razor           ← Inline SVG sparkline (no JS)
-│       └── SvgLineChart.razor        ← Full SVG area chart (no JS)
-│
-├── Pages/
-│   └── _Host.cshtml                  ← Blazor Server HTML host page
+│       ├── Sparkline.razor       ← SVG sparkline (no JS)
+│       └── SvgLineChart.razor    ← SVG area chart (no JS)
 │
 └── wwwroot/
-    ├── css/app.css                   ← Full dark theme design system
-    └── js/app.js                     ← Minimal JS helpers
-Features
-🔐 Authentication
-Login with email or username
-BCrypt hashed passwords
-Scoped AuthService keeps session in Blazor circuit
-Register new accounts with full validation
-🧩 Design Decisions
-Blazor Server chosen for full C# stack (no JS dependency)
-SVG charts instead of Chart.js → zero JS, full control
-Scoped AuthService replaces cookie-based auth
-SQLite for simplicity and portability
-🚧 Limitations
-Uses mock exchange rate data (no live API yet)
-No persistent login across browser sessions
-Limited scalability (Blazor Server circuit model)
-🚀 Future Improvements
-Integrate real-time APIs (ExchangeRate API, CoinGecko)
-Add JWT authentication
-Deploy to cloud (Azure / AWS)
-Add unit + integration tests
-🛠️ Contributing
-Fork the repo
-Create a feature branch
-Commit and push changes
-Open a pull request
-📊 Dashboard
-Good morning/afternoon/evening greeting
-4 stat cards (currencies, crypto, favorites, alerts)
-Top 5 Forex pairs (EUR, GBP, JPY, CAD, AUD vs USD) with inline SVG sparklines
-Top 5 Crypto (BTC, ETH, BNB, SOL, XRP) with market caps
-★ Star any pair to add to favorites directly from dashboard
-Favorites quick-access strip
-💱 Converter
-53 world currencies (USD, EUR, GBP, JPY, CAD, AUD, CHF, BRL, HNL, and 44 more)
-Real-time rate calculation as you change inputs
-⇄ Swap button
-Inverse rate display
-Quick reference table (1, 5, 10, 25, 50, 100, 500, 1000 units)
-Popular pair shortcuts
-📈 Trends
-Any pair from 53 supported currencies
-Period selector: 7 / 14 / 30 / 60 / 90 days
-Pure SVG area chart — no Chart.js, no JavaScript
-Stats: current rate, period change %, high, low
-Full historical data table
-★ Favorites
-Search by code or name across all 53 currencies
-One-click add/remove
-Live USD rates displayed per favorite
-Quick Convert and Trend links
-Persisted to SQLite per user
-🔔 Rate Alerts
-Set alerts: rate goes Above or Below a target
-Background AlertMonitorService checks every 60 seconds
-Notification log with unread indicators
-Mark all read
-Architecture Notes
-Why Blazor Server?
-All C# — components, services, models, routing — everything in one language
-No JavaScript frameworks — React/Vue/Angular replaced by Razor components
-Real-time by default — Blazor's SignalR connection enables live UI updates
-SVG charts in C# — SvgLineChart.razor and Sparkline.razor render charts server-side using C# math, zero JS
-Auth Architecture
-AuthService is scoped to the Blazor circuit (one per browser connection). On login, UserId, Username, and FullName are stored in the service. MainLayout reads Auth.IsAuth to gate all pages. No cookie middleware needed — Blazor's persistent SignalR connection maintains the session.
+    ├── css/app.css               ← Full dark theme
+    └── js/app.js                 ← Minimal JS helpers
+```
 
-Extending to Live APIs
-Replace the mock data in ExchangeRateService.GetTopForex() and GetRate() with real API calls:
+---
 
-// ExchangeRate-API (free tier)
-var json = await _http.GetStringAsync(
-    "https://v6.exchangerate-api.com/v6/YOUR_KEY/latest/USD");
+## Live Rate API
 
-// CoinGecko (no key needed)
-var json = await _http.GetStringAsync(
-    "https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&per_page=5");
-Add HttpClient to DI in Program.cs:
+**Provider:** exchangerate.host  
+**Endpoint:** `GET /live?access_key=KEY&source=USD`  
+**Returns:** All rates vs USD in one call  
+**Cache:** 10-minute in-memory singleton (`RateCache`)  
+**Fallback:** Hardcoded rates used when API is unreachable
 
-builder.Services.AddHttpClient<IExchangeRateService, ExchangeRateService>();
-NuGet Packages
+The `RateCache` is a singleton so all users share one rate fetch.  
+Cross-rates (e.g. EUR → BRL) are computed as: `rate(USD→BRL) / rate(USD→EUR)`.
+
+---
+
+## Simplifications Made
+
+| Before | After |
+|--------|-------|
+| 440-line Services.cs with 6 separate classes | Still one file, but leaner — removed all hardcoded rate dictionaries |
+| `Dictionary<string,double> _usd` with 54 fixed values | Replaced by live API + thin fallback |
+| Sync `GetRate()` throughout | Async `GetRateAsync()` everywhere |
+| Fake spark data from seeded random | Spark built around live rate |
+| Crypto with hardcoded prices | Honest placeholder with upgrade path |
+| `IsFavoriteAsync()` extra DB round-trip | Removed — callers use local HashSet |
+| `RegisterModel` verbose validation attributes | Condensed to one-liners |
+| `CurrencyInfo` class with 4 properties | Replaced with `record` (one line) |
+
+---
+
+## NuGet Packages
+
+```xml
 <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.0" />
 <PackageReference Include="Microsoft.EntityFrameworkCore.Tools"  Version="8.0.0" />
 <PackageReference Include="BCrypt.Net-Next"                      Version="4.0.3" />
-Overdrive Exchange — 100% C# · Blazor Server · EF Core · SQLite · BCrypt · Pure SVG Charts
+```
 
-
-## 📋 Supported Currencies
-
-The app supports 59 currencies including:
-USD, EUR, GBP, JPY, CAD, AUD, CHF, CNY, BRL, MXN, INR, KRW, SGD, HKD, SEK, NOK, DKK, NZD, ZAR, ARS, CLP, COP, PEN, **HNL (Honduran Lempira)**, GTQ, CRC, DOP, TRY, RUB, THB, IDR, MYR, PHP, VND, EGP, NGN, KES, GHS, AED, SAR, ILS, QAR, PKR, BDT, UAH, RON, HUF, CZK, PLN, TWD, HRK, BGN, ISK, MAD, JOD, OMR, KWD, BHD, LKR, MMK
+Cookie auth and HttpClient are built into ASP.NET Core 8 — no extra packages.
 
 ---
+
+## Demo Credentials
+
+| Field    | Value                       |
+|----------|-----------------------------|
+| Username | `demo`                      |
+| Password | `demo123`                   |
+| Email    | `demo@overdriveexchange.app`|
