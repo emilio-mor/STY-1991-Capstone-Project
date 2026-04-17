@@ -1,7 +1,41 @@
 {
   "Version": 1,
   "WorkspaceRootPath": "C:\\Users\\em_jo\\source\\repos\\emilio-mor\\STY-1991-Capstone-Project\\",
-  "Documents": [],
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\em_jo\\OneDrive\\Documents\\Cambrian\\STY1991 - Software Engineering Concepts\\Project\\OverdriveExchange-Blazor (3)\\OD\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\em_jo\\OneDrive\\Documents\\Cambrian\\STY1991 - Software Engineering Concepts\\Project\\OverdriveExchange-Blazor (3)\\OD\\Services\\Services.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\em_jo\\OneDrive\\Documents\\Cambrian\\STY1991 - Software Engineering Concepts\\Project\\OverdriveExchange-Blazor (3)\\OD\\Services\\CryptoService.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\em_jo\\OneDrive\\Documents\\Cambrian\\STY1991 - Software Engineering Concepts\\Project\\OverdriveExchange-Blazor (3)\\OD\\Services\\AuthEndpoints.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\em_jo\\OneDrive\\Documents\\Cambrian\\STY1991 - Software Engineering Concepts\\Project\\OverdriveExchange-Blazor (3)\\OD\\Properties\\launchSettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\em_jo\\OneDrive\\Documents\\Cambrian\\STY1991 - Software Engineering Concepts\\Project\\OverdriveExchange-Blazor (3)\\OD\\Pages\\_Host.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\em_jo\\OneDrive\\Documents\\Cambrian\\STY1991 - Software Engineering Concepts\\Project\\OverdriveExchange-Blazor (3)\\OD\\obj\\project.nuget.cache||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\em_jo\\OneDrive\\Documents\\Cambrian\\STY1991 - Software Engineering Concepts\\Project\\OverdriveExchange-Blazor (3)\\OD\\obj\\project.assets.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\em_jo\\OneDrive\\Documents\\Cambrian\\STY1991 - Software Engineering Concepts\\Project\\OverdriveExchange-Blazor (3)\\OD\\obj\\OverdriveExchange.csproj.nuget.g.targets||{FA3CD31E-987B-443A-9B81-186104E8DAC1}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\em_jo\\OneDrive\\Documents\\Cambrian\\STY1991 - Software Engineering Concepts\\Project\\OverdriveExchange-Blazor (3)\\OD\\obj\\OverdriveExchange.csproj.nuget.g.props||{FA3CD31E-987B-443A-9B81-186104E8DAC1}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\em_jo\\OneDrive\\Documents\\Cambrian\\STY1991 - Software Engineering Concepts\\Project\\OverdriveExchange-Blazor (3)\\OD\\obj\\OverdriveExchange.csproj.nuget.dgspec.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
+    }
+  ],
   "DocumentGroupContainers": [
     {
       "Orientation": 0,
@@ -9,7 +43,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": -1,
+          "SelectedChildIndex": 3,
           "Children": [
             {
               "$type": "Bookmark",
@@ -22,6 +56,149 @@
             {
               "$type": "Bookmark",
               "Name": "ST:129:0:{75188d03-9892-4ae2-abf1-207126247ce5}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "appsettings.json",
+              "DocumentMoniker": "C:\\Users\\em_jo\\OneDrive\\Documents\\Cambrian\\STY1991 - Software Engineering Concepts\\Project\\OverdriveExchange-Blazor (3)\\OD\\appsettings.json",
+              "RelativeDocumentMoniker": "..\\..\\..\\..\\OneDrive\\Documents\\Cambrian\\STY1991 - Software Engineering Concepts\\Project\\OverdriveExchange-Blazor (3)\\OD\\appsettings.json",
+              "ToolTip": "C:\\Users\\em_jo\\OneDrive\\Documents\\Cambrian\\STY1991 - Software Engineering Concepts\\Project\\OverdriveExchange-Blazor (3)\\OD\\appsettings.json",
+              "RelativeToolTip": "..\\..\\..\\..\\OneDrive\\Documents\\Cambrian\\STY1991 - Software Engineering Concepts\\Project\\OverdriveExchange-Blazor (3)\\OD\\appsettings.json",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
+              "WhenOpened": "2026-04-17T01:54:06.783Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "Services.cs",
+              "DocumentMoniker": "C:\\Users\\em_jo\\OneDrive\\Documents\\Cambrian\\STY1991 - Software Engineering Concepts\\Project\\OverdriveExchange-Blazor (3)\\OD\\Services\\Services.cs",
+              "RelativeDocumentMoniker": "..\\..\\..\\..\\OneDrive\\Documents\\Cambrian\\STY1991 - Software Engineering Concepts\\Project\\OverdriveExchange-Blazor (3)\\OD\\Services\\Services.cs",
+              "ToolTip": "C:\\Users\\em_jo\\OneDrive\\Documents\\Cambrian\\STY1991 - Software Engineering Concepts\\Project\\OverdriveExchange-Blazor (3)\\OD\\Services\\Services.cs",
+              "RelativeToolTip": "..\\..\\..\\..\\OneDrive\\Documents\\Cambrian\\STY1991 - Software Engineering Concepts\\Project\\OverdriveExchange-Blazor (3)\\OD\\Services\\Services.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-17T01:54:06.68Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "CryptoService.cs",
+              "DocumentMoniker": "C:\\Users\\em_jo\\OneDrive\\Documents\\Cambrian\\STY1991 - Software Engineering Concepts\\Project\\OverdriveExchange-Blazor (3)\\OD\\Services\\CryptoService.cs",
+              "RelativeDocumentMoniker": "..\\..\\..\\..\\OneDrive\\Documents\\Cambrian\\STY1991 - Software Engineering Concepts\\Project\\OverdriveExchange-Blazor (3)\\OD\\Services\\CryptoService.cs",
+              "ToolTip": "C:\\Users\\em_jo\\OneDrive\\Documents\\Cambrian\\STY1991 - Software Engineering Concepts\\Project\\OverdriveExchange-Blazor (3)\\OD\\Services\\CryptoService.cs",
+              "RelativeToolTip": "..\\..\\..\\..\\OneDrive\\Documents\\Cambrian\\STY1991 - Software Engineering Concepts\\Project\\OverdriveExchange-Blazor (3)\\OD\\Services\\CryptoService.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-17T01:54:06.575Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "AuthEndpoints.cs",
+              "DocumentMoniker": "C:\\Users\\em_jo\\OneDrive\\Documents\\Cambrian\\STY1991 - Software Engineering Concepts\\Project\\OverdriveExchange-Blazor (3)\\OD\\Services\\AuthEndpoints.cs",
+              "RelativeDocumentMoniker": "..\\..\\..\\..\\OneDrive\\Documents\\Cambrian\\STY1991 - Software Engineering Concepts\\Project\\OverdriveExchange-Blazor (3)\\OD\\Services\\AuthEndpoints.cs",
+              "ToolTip": "C:\\Users\\em_jo\\OneDrive\\Documents\\Cambrian\\STY1991 - Software Engineering Concepts\\Project\\OverdriveExchange-Blazor (3)\\OD\\Services\\AuthEndpoints.cs",
+              "RelativeToolTip": "..\\..\\..\\..\\OneDrive\\Documents\\Cambrian\\STY1991 - Software Engineering Concepts\\Project\\OverdriveExchange-Blazor (3)\\OD\\Services\\AuthEndpoints.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-17T01:54:05.824Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "launchSettings.json",
+              "DocumentMoniker": "C:\\Users\\em_jo\\OneDrive\\Documents\\Cambrian\\STY1991 - Software Engineering Concepts\\Project\\OverdriveExchange-Blazor (3)\\OD\\Properties\\launchSettings.json",
+              "RelativeDocumentMoniker": "..\\..\\..\\..\\OneDrive\\Documents\\Cambrian\\STY1991 - Software Engineering Concepts\\Project\\OverdriveExchange-Blazor (3)\\OD\\Properties\\launchSettings.json",
+              "ToolTip": "C:\\Users\\em_jo\\OneDrive\\Documents\\Cambrian\\STY1991 - Software Engineering Concepts\\Project\\OverdriveExchange-Blazor (3)\\OD\\Properties\\launchSettings.json",
+              "RelativeToolTip": "..\\..\\..\\..\\OneDrive\\Documents\\Cambrian\\STY1991 - Software Engineering Concepts\\Project\\OverdriveExchange-Blazor (3)\\OD\\Properties\\launchSettings.json",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
+              "WhenOpened": "2026-04-17T01:54:05.686Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "_Host.cshtml",
+              "DocumentMoniker": "C:\\Users\\em_jo\\OneDrive\\Documents\\Cambrian\\STY1991 - Software Engineering Concepts\\Project\\OverdriveExchange-Blazor (3)\\OD\\Pages\\_Host.cshtml",
+              "RelativeDocumentMoniker": "..\\..\\..\\..\\OneDrive\\Documents\\Cambrian\\STY1991 - Software Engineering Concepts\\Project\\OverdriveExchange-Blazor (3)\\OD\\Pages\\_Host.cshtml",
+              "ToolTip": "C:\\Users\\em_jo\\OneDrive\\Documents\\Cambrian\\STY1991 - Software Engineering Concepts\\Project\\OverdriveExchange-Blazor (3)\\OD\\Pages\\_Host.cshtml",
+              "RelativeToolTip": "..\\..\\..\\..\\OneDrive\\Documents\\Cambrian\\STY1991 - Software Engineering Concepts\\Project\\OverdriveExchange-Blazor (3)\\OD\\Pages\\_Host.cshtml",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2026-04-17T01:54:05.103Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "project.nuget.cache",
+              "DocumentMoniker": "C:\\Users\\em_jo\\OneDrive\\Documents\\Cambrian\\STY1991 - Software Engineering Concepts\\Project\\OverdriveExchange-Blazor (3)\\OD\\obj\\project.nuget.cache",
+              "RelativeDocumentMoniker": "..\\..\\..\\..\\OneDrive\\Documents\\Cambrian\\STY1991 - Software Engineering Concepts\\Project\\OverdriveExchange-Blazor (3)\\OD\\obj\\project.nuget.cache",
+              "ToolTip": "C:\\Users\\em_jo\\OneDrive\\Documents\\Cambrian\\STY1991 - Software Engineering Concepts\\Project\\OverdriveExchange-Blazor (3)\\OD\\obj\\project.nuget.cache",
+              "RelativeToolTip": "..\\..\\..\\..\\OneDrive\\Documents\\Cambrian\\STY1991 - Software Engineering Concepts\\Project\\OverdriveExchange-Blazor (3)\\OD\\obj\\project.nuget.cache",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.002368|",
+              "WhenOpened": "2026-04-17T01:54:04.772Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "project.assets.json",
+              "DocumentMoniker": "C:\\Users\\em_jo\\OneDrive\\Documents\\Cambrian\\STY1991 - Software Engineering Concepts\\Project\\OverdriveExchange-Blazor (3)\\OD\\obj\\project.assets.json",
+              "RelativeDocumentMoniker": "..\\..\\..\\..\\OneDrive\\Documents\\Cambrian\\STY1991 - Software Engineering Concepts\\Project\\OverdriveExchange-Blazor (3)\\OD\\obj\\project.assets.json",
+              "ToolTip": "C:\\Users\\em_jo\\OneDrive\\Documents\\Cambrian\\STY1991 - Software Engineering Concepts\\Project\\OverdriveExchange-Blazor (3)\\OD\\obj\\project.assets.json",
+              "RelativeToolTip": "..\\..\\..\\..\\OneDrive\\Documents\\Cambrian\\STY1991 - Software Engineering Concepts\\Project\\OverdriveExchange-Blazor (3)\\OD\\obj\\project.assets.json",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
+              "WhenOpened": "2026-04-17T01:54:04.652Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
+              "Title": "OverdriveExchange.csproj.nuget.g.targets",
+              "DocumentMoniker": "C:\\Users\\em_jo\\OneDrive\\Documents\\Cambrian\\STY1991 - Software Engineering Concepts\\Project\\OverdriveExchange-Blazor (3)\\OD\\obj\\OverdriveExchange.csproj.nuget.g.targets",
+              "RelativeDocumentMoniker": "..\\..\\..\\..\\OneDrive\\Documents\\Cambrian\\STY1991 - Software Engineering Concepts\\Project\\OverdriveExchange-Blazor (3)\\OD\\obj\\OverdriveExchange.csproj.nuget.g.targets",
+              "ToolTip": "C:\\Users\\em_jo\\OneDrive\\Documents\\Cambrian\\STY1991 - Software Engineering Concepts\\Project\\OverdriveExchange-Blazor (3)\\OD\\obj\\OverdriveExchange.csproj.nuget.g.targets",
+              "RelativeToolTip": "..\\..\\..\\..\\OneDrive\\Documents\\Cambrian\\STY1991 - Software Engineering Concepts\\Project\\OverdriveExchange-Blazor (3)\\OD\\obj\\OverdriveExchange.csproj.nuget.g.targets",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003801|",
+              "WhenOpened": "2026-04-17T01:54:04.562Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 9,
+              "Title": "OverdriveExchange.csproj.nuget.g.props",
+              "DocumentMoniker": "C:\\Users\\em_jo\\OneDrive\\Documents\\Cambrian\\STY1991 - Software Engineering Concepts\\Project\\OverdriveExchange-Blazor (3)\\OD\\obj\\OverdriveExchange.csproj.nuget.g.props",
+              "RelativeDocumentMoniker": "..\\..\\..\\..\\OneDrive\\Documents\\Cambrian\\STY1991 - Software Engineering Concepts\\Project\\OverdriveExchange-Blazor (3)\\OD\\obj\\OverdriveExchange.csproj.nuget.g.props",
+              "ToolTip": "C:\\Users\\em_jo\\OneDrive\\Documents\\Cambrian\\STY1991 - Software Engineering Concepts\\Project\\OverdriveExchange-Blazor (3)\\OD\\obj\\OverdriveExchange.csproj.nuget.g.props",
+              "RelativeToolTip": "..\\..\\..\\..\\OneDrive\\Documents\\Cambrian\\STY1991 - Software Engineering Concepts\\Project\\OverdriveExchange-Blazor (3)\\OD\\obj\\OverdriveExchange.csproj.nuget.g.props",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003801|",
+              "WhenOpened": "2026-04-17T01:54:04.411Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 10,
+              "Title": "OverdriveExchange.csproj.nuget.dgspec.json",
+              "DocumentMoniker": "C:\\Users\\em_jo\\OneDrive\\Documents\\Cambrian\\STY1991 - Software Engineering Concepts\\Project\\OverdriveExchange-Blazor (3)\\OD\\obj\\OverdriveExchange.csproj.nuget.dgspec.json",
+              "RelativeDocumentMoniker": "..\\..\\..\\..\\OneDrive\\Documents\\Cambrian\\STY1991 - Software Engineering Concepts\\Project\\OverdriveExchange-Blazor (3)\\OD\\obj\\OverdriveExchange.csproj.nuget.dgspec.json",
+              "ToolTip": "C:\\Users\\em_jo\\OneDrive\\Documents\\Cambrian\\STY1991 - Software Engineering Concepts\\Project\\OverdriveExchange-Blazor (3)\\OD\\obj\\OverdriveExchange.csproj.nuget.dgspec.json",
+              "RelativeToolTip": "..\\..\\..\\..\\OneDrive\\Documents\\Cambrian\\STY1991 - Software Engineering Concepts\\Project\\OverdriveExchange-Blazor (3)\\OD\\obj\\OverdriveExchange.csproj.nuget.dgspec.json",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
+              "WhenOpened": "2026-04-17T01:54:03.621Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Bookmark",

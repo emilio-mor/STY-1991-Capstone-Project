@@ -1,0 +1,101 @@
+@page "/crypto"
+@inject ICryptoService CryptoSvc
+
+<PageTitle>Crypto Markets — Overdrive Exchange</PageTitle>
+
+<div class="page">
+    <div class="page-header">
+        <div>
+            <h1>Crypto Markets</h1>
+            <p class="page-sub">Live prices · Top 5 by market cap</p>
+        </div>
+        <div class="live-pill"><span class="live-dot"></span>LIVE</div>
+    </div>
+
+    @if (_loading)
+    {
+        <div class="loading-bar"><div class="loading-fill"></div></div>
+        <p class="loading-msg">Fetching live crypto prices…</p>
+    }
+    else
+    {
+        <div class="crypto-grid">
+            @foreach (var c in _coins)
+            {
+                bool up = c.ChangePercent24h >= 0;
+                <div class="crypto-card">
+                    <div class="cc-header">
+                        <div class="cc-icon-wrap" style="background:@(c.Color)22">
+                            @if (!string.IsNullOrEmpty(c.ImageUrl))
+                            {
+                                <img src="@c.ImageUrl" alt="@c.Symbol" class="cc-img" />
+                            }
+                            else
+                            {
+                                <span class="cc-icon" style="color:@c.Color">@c.Icon</span>
+                            }
+                        </div>
+                        <div class="cc-id">
+                            <div class="cc-symbol">@c.Symbol</div>
+                            <div class="cc-name">@c.Name</div>
+                        </div>
+                        <div class="cc-change @(up ? "chg-up" : "chg-dn")">
+                            @(up ? "▲" : "▼") @Math.Abs(c.ChangePercent24h).ToString("F2")%
+                        </div>
+                    </div>
+                    <div class="cc-price">
+                        $@(c.PriceUsd >= 1 ? c.PriceUsd.ToString("N2") : c.PriceUsd.ToString("N6"))
+                    </div>
+                    <div class="cc-stats">
+                        <div class="cc-stat">
+                            <div class="cc-stat-label">Market Cap</div>
+                            <div class="cc-stat-val">$@c.MarketCapBillions.ToString("F1")B</div>
+                        </div>
+                        <div class="cc-stat">
+                            <div class="cc-stat-label">24h Volume</div>
+                            <div class="cc-stat-val">$@c.Volume24hBillions.ToString("F2")B</div>
+                        </div>
+                    </div>
+                    <div class="cc-bar">
+                        <div class="cc-bar-fill @(up ? "cc-bar-up" : "cc-bar-dn")"
+                             style="width:@(Math.Min(Math.Abs(c.ChangePercent24h) * 10, 100).ToString("F0"))%">
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <!-- CoinGecko Attribution — required by their Terms of Service -->
+        <!-- Per https://brand.coingecko.com/resources/attribution-guide -->
+        <div class="coingecko-attr coingecko-attr-full">
+            <a href="https://www.coingecko.com/en/api" target="_blank" rel="noopener noreferrer"
+               title="Cryptocurrency data provided by CoinGecko">
+                <img src="https://static.coingecko.com/s/coingecko-logo-8903d34ce19ca4be1c81f0db30e924154750d2fad96afe655effa9a19a893933.png"
+                     alt="CoinGecko" class="coingecko-logo" />
+            </a>
+            <div class="coingecko-text">
+                <span>Data powered by</span>
+                <a href="https://www.coingecko.com/en/api" target="_blank" rel="noopener noreferrer">CoinGecko</a>
+                <span class="muted">— The world's largest independent crypto data aggregator</span>
+            </div>
+        </div>
+
+        <div class="coingecko-disclaimer">
+            Prices refresh every 5 minutes. Rate limit: 30 calls/min (Demo plan).
+            Last updated: @_lastUpdated
+        </div>
+    }
+</div>
+
+@code {
+    private List<CryptoRate> _coins       = new();
+    private bool             _loading     = true;
+    private string           _lastUpdated = "—";
+
+    protected override async Task OnInitializedAsync()
+    {
+        _coins       = await CryptoSvc.GetTopCryptoAsync();
+        _lastUpdated = DateTime.Now.ToString("HH:mm:ss");
+        _loading     = false;
+    }
+}

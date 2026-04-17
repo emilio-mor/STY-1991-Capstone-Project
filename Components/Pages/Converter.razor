@@ -1,0 +1,104 @@
+@page "/converter"
+@inject IExchangeRateService Rates
+
+<PageTitle>Converter — Overdrive Exchange</PageTitle>
+
+<div class="page">
+    <div class="page-header">
+        <div><h1>Currency Converter</h1><p class="page-sub">Live rates · 53 currencies</p></div>
+    </div>
+
+    <div class="card conv-card">
+        <div class="conv-grid">
+            <div class="conv-side">
+                <label class="conv-label">From</label>
+                <select class="fx-select" @bind="_from" @bind:after="Calculate">
+                    @foreach (var c in _currencies) { <option value="@c.Code">@c.Flag @c.Code – @c.Name</option> }
+                </select>
+                <input type="number" class="fx-input" @bind="_amount" @bind:event="oninput"
+                       @bind:after="Calculate" placeholder="1.00" min="0" step="any" />
+            </div>
+            <div class="conv-swap">
+                <button class="swap-btn" @onclick="Swap">⇄</button>
+            </div>
+            <div class="conv-side">
+                <label class="conv-label">To</label>
+                <select class="fx-select" @bind="_to" @bind:after="Calculate">
+                    @foreach (var c in _currencies) { <option value="@c.Code">@c.Flag @c.Code – @c.Name</option> }
+                </select>
+                <div class="fx-result">
+                    @if (_busy) { <span class="muted">Calculating…</span> }
+                    else if (_result != null && _amount > 0) { <span>@_result.Result.ToString("N6")</span> }
+                    else { <span class="fx-placeholder">—</span> }
+                </div>
+            </div>
+        </div>
+
+        @if (_result != null && _amount > 0 && !_busy)
+        {
+            <div class="result-box">
+                <div class="result-main">
+                    <span class="res-from">@_result.FromFlag @_amount.ToString("N2") @_result.FromCode</span>
+                    <span class="res-eq">=</span>
+                    <span class="res-to">@_result.ToFlag @_result.Result.ToString("N4") @_result.ToCode</span>
+                </div>
+                <div class="result-rates">
+                    <span>1 @_result.FromCode = <b>@_result.Rate.ToString("F6")</b> @_result.ToCode</span>
+                    <span>1 @_result.ToCode = <b>@_result.Inverse.ToString("F6")</b> @_result.FromCode</span>
+                </div>
+                <div class="result-time">Live rate · @_result.At.ToLocalTime().ToString("HH:mm:ss, MMM dd yyyy")</div>
+            </div>
+
+            <div class="section-label mt-4 mb-2">Quick Reference</div>
+            <div class="quick-table">
+                @foreach (var m in new[] { 1,5,10,25,50,100,500,1000 })
+                {
+                    <div class="quick-row">
+                        <span>@m @_from</span><span>→</span>
+                        <span>@((m * _result.Rate).ToString("N4")) @_to</span>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+
+    <div class="card mt-4">
+        <div class="section-label mb-3">Popular Pairs</div>
+        <div class="pairs-wrap">
+            @foreach (var (f,t) in _popularPairs)
+            {
+                <button class="pair-chip @(_from==f&&_to==t?"pair-active":"")"
+                        @onclick="()=>SetPair(f,t)">@f / @t</button>
+            }
+        </div>
+    </div>
+</div>
+
+@code {
+    private List<CurrencyInfo> _currencies = new();
+    private string  _from   = "USD";
+    private string  _to     = "EUR";
+    private double  _amount = 1;
+    private bool    _busy;
+    private ConversionResult? _result;
+
+    private static readonly (string, string)[] _popularPairs =
+        { ("USD","EUR"),("USD","GBP"),("USD","JPY"),("USD","CAD"),("BRL","HNL"),("EUR","BRL"),("GBP","JPY"),("USD","BRL"),("HNL","USD") };
+
+    protected override async Task OnInitializedAsync()
+    {
+        _currencies = Rates.GetAllCurrencies();
+        await Calculate();
+    }
+
+    private async Task Calculate()
+    {
+        if (_amount <= 0) return;
+        _busy   = true; StateHasChanged();
+        _result = await Rates.ConvertAsync(_from, _to, _amount);
+        _busy   = false;
+    }
+
+    private async Task Swap() { (_from, _to) = (_to, _from); await Calculate(); }
+    private async Task SetPair(string f, string t) { _from = f; _to = t; await Calculate(); }
+}
